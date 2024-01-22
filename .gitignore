@@ -2,3 +2,6 @@
 
 # Ignoring Enviornment Directorys
 env/
+
+# Ignoring .env file
+.env
