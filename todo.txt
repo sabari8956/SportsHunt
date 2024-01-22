@@ -1,0 +1,2 @@
+Now future sab should get started from copying settings file to common.py
+and change according to the dev file or prod file respectively.
