@@ -3,5 +3,8 @@
 # Ignoring Enviornment Directorys
 env/
 
+# catch file
+__pycache__/
+
 # Ignoring .env file
 .env
