@@ -8,3 +8,7 @@ __pycache__/
 
 # Ignoring .env file
 .env
+
+
+# ignoring db 
+db.sqlite3
