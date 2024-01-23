@@ -4,6 +4,7 @@
     -> add atributes to dev.py / prod.py
 ✅    -> edit wsgi file
 ✅    -> add .env file to save values and edit the dev / prod  to use its values
+    -> Edit templates in common.py
 
 Now future sab should get started from copying settings file to common.py
 and change according to the dev file or prod file respectively.
