@@ -6,5 +6,5 @@ class User(AbstractUser):
     last_name = None
     first_name = None
     is_organizer = models.BooleanField('organizer status', default=False)
-    email = models.EmailField(max_length=254)
+    email = models.EmailField(max_length=254, blank= False, unique=True)
     name = models.CharField('full name', max_length=254)
