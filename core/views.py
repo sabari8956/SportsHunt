@@ -16,6 +16,8 @@ def login_view(req):
 
         if user is not None:
             login(req, user)
+            if user.is_organizer:
+                return HttpResponseRedirect(reverse("organisers:index"))
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(req, "auth/login.html", {
@@ -62,6 +64,8 @@ def register_view(req):
                     "message": str(e)
                 })
         login(req, user)
+        if user.is_organizer:
+            return HttpResponseRedirect(reverse("organisers:index"))
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(req, "auth/register.html")
