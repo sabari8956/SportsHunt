@@ -3,9 +3,9 @@
     {% if user.is_organizer %}
         <p>You are a organiser!</p>
     {% endif %}
-    <a href="{% url 'logout' %}">Logout</a>
+    <a href="{% url 'core:logout' %}">Logout</a>
 {% else %}
     <h1>Hello, World</h1>
-    <a href="{% url 'login' %}">Login</a>
-    <a href="{% url 'register' %}">register</a>
+    <a href="{% url 'core:login' %}">Login</a>
+    <a href="{% url 'core:register' %}">register</a>
 {% endif %}

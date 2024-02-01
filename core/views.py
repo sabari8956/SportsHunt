@@ -18,7 +18,7 @@ def login_view(req):
             login(req, user)
             if user.is_organizer:
                 return HttpResponseRedirect(reverse("organisers:index"))
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("core:index"))
         else:
             return render(req, "auth/login.html", {
                 "message": "Invalid Username/ Password",
@@ -27,7 +27,7 @@ def login_view(req):
 
 def logout_view(req):
     logout(req)
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("core:index"))
 
 def register_view(req):
     if req.method == "POST":
@@ -66,6 +66,6 @@ def register_view(req):
         login(req, user)
         if user.is_organizer:
             return HttpResponseRedirect(reverse("organisers:index"))
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse("core:index"))
     else:
         return render(req, "auth/register.html")
