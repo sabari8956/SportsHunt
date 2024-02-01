@@ -33,7 +33,6 @@ def register_view(req):
         email = req.POST["email"]
         password = req.POST["password"]
         confirmation = req.POST["confirmation"]
-        
         if not username:
             return render(req, "auth/register.html", {
                 "message": "Enter a Valid Username"
@@ -55,6 +54,8 @@ def register_view(req):
         else:
             try:
                 user = User.objects.create_user(username, email, password)
+                if req.POST.get("is_organiser", False):
+                    user.is_organizer = True
                 user.save()
             except Exception as e:
                 return render(req, "auth/register.html", {
