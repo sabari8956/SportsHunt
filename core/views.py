@@ -6,7 +6,10 @@ from django.db import IntegrityError
 
 # Create your views here.
 def index(req):
-    return render(req, "core/index.html")
+    messages = req._messages
+    return render(req, "core/index.html", {
+        "messages":messages,
+    })
 
 def login_view(req):
     if req.method == "POST":

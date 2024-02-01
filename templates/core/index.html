@@ -1,3 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+{% block message %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock message %}
+
+{% block body %}
+
 {% if user.is_authenticated  %}
     <h1>Hello, {{user}} </h1>
     {% if user.is_organizer %}
@@ -9,3 +32,4 @@
     <a href="{% url 'core:login' %}">Login</a>
     <a href="{% url 'core:register' %}">register</a>
 {% endif %}
+{% endblock body %}
