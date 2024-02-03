@@ -1,3 +1,4 @@
-New Tasks will be added Soon
-✅    -> add basic login and logout features 
-✅    -> OAuth2
+Tasks
+    -> Design a proper struct
+    -> create models for Tournaments with permission
+    -> only organiser can create Tournaments
