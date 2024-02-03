@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create a org
+{% endblock title %}
+
+{% block body %}
+<h1>Create a Organisation</h1>
+
+<div class="col-md-4 offset-md-4">
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="Organisation"><h4>Organisation Name</h4></label>
+            <input class="form-control" autofocus type="text" name="organisation_name" placeholder="Organisation Name" required>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="organisation_mail"><h4>Organisation Mail</h4></label>
+            <input class="form-control" type="email" name="organisation_mail" placeholder="Email Address" required>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="phone_no"><h4>Whatsapp Number</h4></label>
+            <input type="number" name="phone_no" class="form-control" pattern="[0-9]{10}" placeholder="Whatsapp Number" required>
+        </div>
+        <br>
+        <input class="btn btn-primary" type="submit" value="Create Organisation">
+    </form>
+    <br>
+    <a href="{% url 'organisers:index' %}">I'll Create Later</a>
+</div>
+{% endblock body %}
