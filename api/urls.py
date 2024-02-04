@@ -2,5 +2,5 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', index, name="api_index"),
+    path('', OrganisationApi, name="org"),
 ]

@@ -19,7 +19,7 @@ def login_view(req):
 
         if user is not None:
             login(req, user)
-            if user.is_organizer:
+            if user.is_organiser:
                 return HttpResponseRedirect(reverse("organisers:index"))
             return HttpResponseRedirect(reverse("core:index"))
         else:
@@ -60,14 +60,14 @@ def register_view(req):
             try:
                 user = User.objects.create_user(username, email, password)
                 if req.POST.get("is_organiser", False):
-                    user.is_organizer = True
+                    user.is_organiser = True
                 user.save()
             except Exception as e:
                 return render(req, "auth/register.html", {
                     "message": str(e)
                 })
         login(req, user)
-        if user.is_organizer:
+        if user.is_organiser:
             return HttpResponseRedirect(reverse("organisers:index"))
         return HttpResponseRedirect(reverse("core:index"))
     else:

@@ -8,23 +8,24 @@ Create a org
 <h1>Create a Organisation</h1>
 
 <div class="col-md-4 offset-md-4">
-    <form action="" method="post">
+    <form action="{% url 'api:org' %}" method="post">
         {% csrf_token %}
         <div class="form-group">
-            <label for="Organisation"><h4>Organisation Name</h4></label>
-            <input class="form-control" autofocus type="text" name="organisation_name" placeholder="Organisation Name" required>
+            <label for="name"><h4>Organisation Name</h4></label>
+            <input class="form-control" autofocus type="text" name="name" placeholder="Organisation Name" required>
         </div>
         <br>
         <div class="form-group">
-            <label for="organisation_mail"><h4>Organisation Mail</h4></label>
-            <input class="form-control" type="email" name="organisation_mail" placeholder="Email Address" required>
+            <label for="mail"><h4>Organisation Mail</h4></label>
+            <input class="form-control" type="email" name="mail" placeholder="Email Address" required>
         </div>
         <br>
         <div class="form-group">
-            <label for="phone_no"><h4>Whatsapp Number</h4></label>
-            <input type="number" name="phone_no" class="form-control" pattern="[0-9]{10}" placeholder="Whatsapp Number" required>
+            <label for="wh_num"><h4>Whatsapp Number</h4></label>
+            <input type="number" name="wh_num" class="form-control" pattern="[0-9]{10}" placeholder="Whatsapp Number" required>
         </div>
         <br>
+        <input type="hidden" name="admin" value="{{ request.user.id }}">
         <input class="btn btn-primary" type="submit" value="Create Organisation">
     </form>
     <br>
