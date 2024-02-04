@@ -23,7 +23,7 @@ Home
 
 {% if user.is_authenticated  %}
     <h1>Hello, {{user}} </h1>
-    {% if user.is_organizer %}
+    {% if user.is_organiser %}
         <p>You are a organiser!</p>
     {% endif %}
     <a href="{% url 'core:logout' %}">Logout</a>

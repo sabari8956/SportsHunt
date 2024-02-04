@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from utils import *
 # Create your views here.
 @login_required(login_url="/login/")
 def index(req):
@@ -12,10 +12,13 @@ def index(req):
 
 @login_required(login_url="/login/")
 def organisation_creation_form(req):
+    
     if not (req.user.is_organiser):
         messages.add_message(req, messages.INFO, 'You Need to be a Organiser!')
         return redirect("core:index")
+    
     if req.method == 'POST':
-        form_data = req.POST
+        form_data = clean_querydict(req.POST)
         print(form_data)
+    
     return render(req, "organisers/organisation_form.html")
