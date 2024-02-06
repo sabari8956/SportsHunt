@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+Select Org
+{% endblock title %}
+
+{% block body %}
+<h1>Select your Organisation</h1>
+
+<div class="col-md-4 offset-md-4">
+    <form action="" method="post">
+        {% csrf_token %}
+        
+        {% for org in orgs %}
+        <input type="radio" id="{{ org.name }}" name="option" value="{{ org.id }}">
+        <label for="option">{{ org.name }}</label><br>
+        {% empty %}
+        <h2>Create a Org <a href="{% url 'new_organisation' %}">Here</a></h2>
+        {% endfor %}
+        <button type="submit">Select</button>
+
+    </form>
+</div>
+{% endblock body %}
