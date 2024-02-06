@@ -17,7 +17,9 @@ def index(req):
         return redirect("organisers:orgs")
     orgs = Organisation.objects.get(id= organisation)
     serializer = OrganisationSerializer(orgs)
-    
+    if not (req.user.id == serializer.data["admin"] or  req.user.id in serializer.data["mods"]):
+        req.session["organisation"] = None
+        return redirect("organisers:orgs")
     return render(req, "organisers/organiser_index.html", {
         "organisation": serializer.data
     })
