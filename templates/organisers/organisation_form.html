@@ -22,7 +22,7 @@ Create a org
         <br>
         <div class="form-group">
             <label for="wh_num"><h4>Whatsapp Number</h4></label>
-            <input type="number" name="wh_num" class="form-control" pattern="[0-9]{10}" placeholder="Whatsapp Number" required>
+            <input type="number" name="wh_num" class="form-control" pattern="^[0-9]{10}$" placeholder="Whatsapp Number" required>
         </div>
         <br>
         <input type="hidden" name="admin" value="{{ request.user.id }}">

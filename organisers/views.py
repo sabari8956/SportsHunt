@@ -41,9 +41,15 @@ def organisation_creation_form(req):
 def organisation_page(req):
     orgs = Organisation.objects.filter(admin= req.user)
     serializer = OrganisationSerializer(orgs, many=True)
+    orgs = [org['id'] for org in serializer.data]
+    if len(orgs) == 0:
+        return redirect("organisers:new_organisation")
+    if len(orgs) == 1:
+        req.session["organisation"] = orgs[0]
+        return redirect("organisers:index")
+    
     if req.method == "POST":
         opt = int(req.POST["option"])
-        orgs = [org['id'] for org in serializer.data]
         if opt in orgs:
             req.session["organisation"] = opt
         else:
@@ -54,7 +60,6 @@ def organisation_page(req):
         messages.add_message(req, messages.INFO, 'You Need to be a Organiser!')
         return redirect("core:index")
     
-
     return render(req, "organisers/organisation_selection.html", {
         "orgs": serializer.data,
     })

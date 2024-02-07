@@ -4,6 +4,8 @@ from organisers.models import *
 from core.models import *
 from .serializer import *
 from django.shortcuts import redirect
+from django.contrib import messages
+
 
 @api_view(["GET", "POST"])
 def OrganisationApi(req):
@@ -13,8 +15,10 @@ def OrganisationApi(req):
         if serializers.is_valid():
             serializers.save()
             return redirect('core:index')
-        return Response(serializers.errors)
+        messages.add_message(req, messages.WARNING, serializers.errors)
+        return redirect("organisers:new_organisation")
     
     data = Organisation.objects.all()
     serializers = OrganisationSerializer(data, many=True)
-    return Response(serializers.data)
+    # return Response(serializers.data)
+    return redirect('core:index')
