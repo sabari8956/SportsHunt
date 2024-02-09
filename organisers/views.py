@@ -32,9 +32,16 @@ def organisation_creation_form(req):
         return redirect("core:index")
     
     if req.method == 'POST':
-        form_data = clean_querydict(req.POST)
-        print(form_data)
-    
+        serializer = OrganisationSerializer(data= req.POST)
+        if serializer.is_valid():
+            serializer.save()
+            return redirect("organisers:orgs")
+        
+        messages.add_message(req, messages.WARNING, serializer.errors)
+        return render(req, "organisers/organisation_form.html", {
+            "initial_data": req.POST
+            })
+
     return render(req, "organisers/organisation_form.html")
 
 @login_required(login_url="/login/")

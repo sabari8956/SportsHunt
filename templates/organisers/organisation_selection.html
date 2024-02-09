@@ -14,11 +14,11 @@ Select Org
         {% for org in orgs %}
         <input type="radio" id="{{ org.name }}" name="option" value="{{ org.id }}">
         <label for="option">{{ org.name }}</label><br>
-        <button type="submit">Select</button>
-    </form>
         {% empty %}
         <h2>Create a Org <a href="{% url 'organisers:new_organisation' %}">Here</a></h2>
         {% endfor %}
+        <button type="submit">Select</button>
+    </form>
 
 </div>
 {% endblock body %}
