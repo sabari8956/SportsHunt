@@ -4,22 +4,6 @@
 Create a org
 {% endblock title %}
 
-{% block message %}
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-            {{message}}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {% endfor %}
-    </ul>
-    {% endif %}
-{% endblock message %}
-
-
 {% block body %}
 <h1>Create a Organisation</h1>
 {{ error }}
@@ -28,17 +12,17 @@ Create a org
         {% csrf_token %}
         <div class="form-group">
             <label for="name"><h4>Organisation Name</h4></label>
-            <input class="form-control" autofocus type="text" name="name" placeholder="Organisation Name" value="{{ initial_data.name }}" required>
+            <input class="form-control" autofocus type="text" name="name" placeholder="Organisation Name" value="{{ form.name }}" required>
         </div>
         <br>
         <div class="form-group">
             <label for="mail"><h4>Organisation Mail</h4></label>
-            <input class="form-control" type="email" name="mail" placeholder="Email Address" value="{{ initial_data.mail }}" required>
+            <input class="form-control" type="email" name="mail" placeholder="Email Address" value="{{ form.mail }}" required>
         </div>
         <br>
         <div class="form-group">
             <label for="wh_num"><h4>Whatsapp Number</h4></label>
-            <input type="number" name="wh_num" class="form-control" pattern="^[0-9]{10}$" placeholder="Whatsapp Number" value="{{ initial_data.wh_num }}" required>
+            <input type="number" name="wh_num" class="form-control" pattern="^[0-9]{10}$" placeholder="Whatsapp Number" value="{{ form.wh_num }}" required>
         </div>
         <br>
         <input type="hidden" name="admin" value="{{ request.user.id }}">

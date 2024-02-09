@@ -4,33 +4,29 @@ from django.contrib import messages
 from utils import *
 from api.serializer import OrganisationSerializer
 from .models import *
-
+from .decorators import organiser_required
 # Create your views here.
-@login_required(login_url="/login/")
+
+@organiser_required
 def index(req):
-    if not (req.user.is_organiser):
-        messages.add_message(req, messages.INFO, 'You Need to be a Organiser!')
-        return redirect("core:index")
     
     organisation = req.session.get("organisation", None)
     if not organisation:
         return redirect("organisers:orgs")
+    
     orgs = Organisation.objects.get(id= organisation)
     serializer = OrganisationSerializer(orgs)
+    
     if not (req.user.id == serializer.data["admin"] or  req.user.id in serializer.data["mods"]):
         req.session["organisation"] = None
         return redirect("organisers:orgs")
+    
     return render(req, "organisers/organiser_index.html", {
         "organisation": serializer.data
     })
 
-@login_required(login_url="/login/")
+@organiser_required
 def organisation_creation_form(req):
-    
-    if not (req.user.is_organiser):
-        messages.add_message(req, messages.INFO, 'You Need to be a Organiser!')
-        return redirect("core:index")
-    
     if req.method == 'POST':
         serializer = OrganisationSerializer(data= req.POST)
         if serializer.is_valid():
@@ -39,21 +35,16 @@ def organisation_creation_form(req):
         
         messages.add_message(req, messages.WARNING, serializer.errors)
         return render(req, "organisers/organisation_form.html", {
-            "initial_data": req.POST
+            "form_data": req.POST
             })
 
     return render(req, "organisers/organisation_form.html")
 
-@login_required(login_url="/login/")
+@organiser_required
 def organisation_page(req):
     orgs = Organisation.objects.filter(admin= req.user)
     serializer = OrganisationSerializer(orgs, many=True)
     orgs = [org['id'] for org in serializer.data]
-    if len(orgs) == 0:
-        return redirect("organisers:new_organisation")
-    if len(orgs) == 1:
-        req.session["organisation"] = orgs[0]
-        return redirect("organisers:index")
     
     if req.method == "POST":
         opt = int(req.POST["option"])
@@ -62,11 +53,14 @@ def organisation_page(req):
         else:
             messages.add_message(req, messages.ERROR, 'Some Error OccurEd')
         return redirect("organisers:index")
-
-    if not (req.user.is_organiser):
-        messages.add_message(req, messages.INFO, 'You Need to be a Organiser!')
-        return redirect("core:index")
     
+    if len(orgs) == 0:
+        return redirect("organisers:new_organisation")
+    
+    elif len(orgs) == 1:
+        req.session["organisation"] = orgs[0]
+        return redirect("organisers:index")
+
     return render(req, "organisers/organisation_selection.html", {
         "orgs": serializer.data,
     })
