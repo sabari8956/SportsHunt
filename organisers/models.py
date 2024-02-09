@@ -12,6 +12,7 @@ class Organisation(models.Model):
     mods = models.ManyToManyField(User, related_name='organisation_mod', blank= True)
     
     def save(self, *args, **kwargs):
+        self.name = self.name.replace(" ", "_")
         if not self.admin.is_organiser:
             raise ValidationError("Only organisers can create an organisation.")
         super().save(*args, **kwargs)
