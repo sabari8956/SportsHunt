@@ -1,5 +1,5 @@
 Tasks
 ✅[kinda]    -> Design a proper struct
-    -> Change Every Thing to DRF
-    -> create models for Tournaments with permission
-    -> only organiser can create Tournaments
+✅    -> Change Every Thing to DRF
+❌    -> create models for Tournaments with permission
+✅    -> only organiser can create Tournaments
