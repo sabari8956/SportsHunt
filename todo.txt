@@ -1,5 +1,5 @@
 Tasks
-✅[kinda]    -> Design a proper struct
-✅    -> Change Every Thing to DRF
-❌    -> create models for Tournaments with permission
-✅    -> only organiser can create Tournaments
+    -> new decorator (organiser_required)
+    -> Clean Template
+    -> convert forms to form.py
+    
