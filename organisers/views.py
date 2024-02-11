@@ -4,6 +4,7 @@ from django.contrib import messages
 from utils import *
 from api.serializer import OrganisationSerializer
 from .models import *
+from .forms import *
 from .decorators import organiser_required
 # Create your views here.
 
@@ -27,18 +28,20 @@ def index(req):
 
 @organiser_required
 def organisation_creation_form(req):
-    if req.method == 'POST':
-        serializer = OrganisationSerializer(data= req.POST)
-        if serializer.is_valid():
-            serializer.save()
-            return redirect("organisers:orgs")
+    if req.method == "POST":
+        form = OrganaisationForm(req.POST)
+        if form.is_valid():
+            req.session["organisation"] = form.save(admin= req.user).id
+            return redirect("organisers:index")
         
-        messages.add_message(req, messages.WARNING, serializer.errors)
         return render(req, "organisers/organisation_form.html", {
-            "form_data": req.POST
+            "form": form 
             })
+    
+    return render(req, "organisers//organisation_form.html",{
+        "form": OrganaisationForm(),
+    })
 
-    return render(req, "organisers/organisation_form.html")
 
 @organiser_required
 def organisation_page(req):

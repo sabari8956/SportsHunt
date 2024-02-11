@@ -12,7 +12,9 @@ class Organisation(models.Model):
     mods = models.ManyToManyField(User, related_name='organisation_mod', blank= True)
     
     def save(self, *args, **kwargs):
-        self.name = self.name.replace(" ", "_")
+        self.name = self.name.lower().replace(" ", "_")
+        if self.name in [org.name for org in Organisation.objects.all()]:
+            raise ValidationError("Organisation name already exists.")
         if not self.admin.is_organiser:
             raise ValidationError("Only organisers can create an organisation.")
         super().save(*args, **kwargs)
