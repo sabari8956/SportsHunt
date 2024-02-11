@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load widget_tweaks %}
 {% block title %}
 Create a org
 {% endblock title %}
@@ -7,10 +7,18 @@ Create a org
 {% block body %}
 <h1>Create a Organisation</h1>
 {{ error }}
-<div class="col-md-4 offset-md-4">
-    <form action="" method="post">
+<div class="col-md-4 offset-md-4 form-group">
+    <form action="" method="post" class="">
         {% csrf_token %}
-        {{ form }}
+        <label for="{{form.name.label}}">{{form.name.label}}</label>
+        {% render_field form.name rows="20" cols="20" class+="form-control" placeholder=form.name.label name=form.name.label %}
+        <br>
+        <label for="{{form.mail.label}}">{{form.mail.label}}</label>
+        {% render_field form.mail rows="20" cols="20" class+="form-control" placeholder=form.mail.label name=form.mail.label %}
+        <br>
+        <label for="{{form.wh_num.label}}">{{form.wh_num.label}}</label>
+        {% render_field form.wh_num rows="20" cols="20" class+="form-control" placeholder=form.wh_num.label name=form.wh_num.label%}
+        <br>
         <input class="btn btn-primary" type="submit" value="Create Organisation">
     </form>
     <br>

@@ -23,6 +23,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
+    'widget_tweaks',
 ]
 
 APPS = [

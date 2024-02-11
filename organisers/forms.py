@@ -2,9 +2,9 @@ from django import forms
 from .models import Organisation
 
 class OrganaisationForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    mail = forms.EmailField()
-    wh_num = forms.CharField(max_length=10)
+    name = forms.CharField(max_length=100, label="Organisation Name")
+    mail = forms.EmailField(label="Email")
+    wh_num = forms.CharField(max_length=10, label="Whatsapp Number")
     
     def clean_name(self):
         name = self.cleaned_data['name'].lower().replace(" ", "_")
