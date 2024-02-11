@@ -2,6 +2,8 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from .models import *
+from organisers.models import *
+from api.serializer import *
 from django.db import IntegrityError
 
 # Create your views here.
@@ -72,3 +74,15 @@ def register_view(req):
         return HttpResponseRedirect(reverse("core:index"))
     else:
         return render(req, "auth/register.html")
+
+def organisation_view(req, org_name):
+    if not (Organisation.objects.filter(name=org_name).exists()):
+        return render(req, "errors/organisation_not_found.html", {
+            "org_name": org_name,
+        })
+    org_data = Organisation.objects.get(name=org_name)
+    serializer = OrganisationSerializer(org_data, many=False)
+    print(serializer.data)
+    return render(req, "core/organisation.html", {
+        "org_data": serializer.data,
+    })
