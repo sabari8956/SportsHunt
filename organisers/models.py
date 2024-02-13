@@ -21,3 +21,25 @@ class Organisation(models.Model):
     
     def __str__(self) -> str:
         return f"{self.name}"
+    
+class Tournament(models.Model):
+    name = models.CharField('tournament name', max_length=254, unique=True)
+    org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
+    mods = models.ManyToManyField(User, related_name='tournament_mod', blank= True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    GAMES = [
+        ('Badminton', 'badminton'),
+        ('Tennis', 'tennis'),
+    ]
+    game = models.CharField('game type', max_length=254, choices=GAMES, default='Badminton')
+    
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower().replace(" ", "_")
+        if self.name in [tour.name for tour in Tournament.objects.all()]:
+            raise ValidationError("Tournament name already exists.")
+        
+        super().save(*args, **kwargs)
+    
+    def __str__(self) -> str:
+        return f"{self.name}"

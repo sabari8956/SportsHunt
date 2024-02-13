@@ -67,3 +67,19 @@ def organisation_page(req):
     return render(req, "organisers/organisation_selection.html", {
         "orgs": serializer.data,
     })
+    
+@organiser_required
+def tournament_creation_form(req):
+    if req.method == "POST":
+        form = TournamentForm(req.POST)
+        if form.is_valid():
+            form.save(org= req.session["organisation"])
+            return redirect("organisers:index")
+
+        return render(req, "organisers/tournament_form.html", {
+            "form": form 
+            })
+    
+    return render(req, "organisers/tournament_form.html",{
+        "form": TournamentForm(),
+    })

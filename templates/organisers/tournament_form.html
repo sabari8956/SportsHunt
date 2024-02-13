@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}
+New Tournament
+{% endblock title %}
+
+{% block body %}
+<h1>Create a Organisation</h1>
+{{ error }}
+
+<div class="col-md-4 offset-md-4 form-group">
+    <form action="" method="post" class="">
+        {% csrf_token %}
+        <label for="{{form.name.label}}">{{form.name.label}}</label>
+        {% render_field form.name rows="20" cols="20" class+="form-control" placeholder=form.name.label name=form.name.label %}
+
+        <label for="{{form.start_date.label}}">{{form.start_date.label}}</label>
+        {% render_field form.start_date rows="10" cols="10" class+="form-control" placeholder=form.start_date.label name=form.start_date.label type="date" %}
+        
+        <label for="{{form.end_date.label}}">{{form.end_date.label}}</label>
+        {% render_field form.end_date rows="10" cols="10" class+="form-control" placeholder=form.end_date.label name=form.end_date.label type="date" %}
+
+        <label for="{{form.game.label}}">{{form.game.label}}</label>
+        {% render_field form.game rows="10" cols="10" class+="form-control" placeholder=form.game.label name=form.game.label %}
+        <input class="btn btn-primary" type="submit" value="Create Tournament">
+    </form>
+    <br>
+    <a href="{% url 'organisers:index' %}">I'll Create Later</a>
+</div>
+{% endblock body %}
