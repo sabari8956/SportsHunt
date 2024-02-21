@@ -9,4 +9,9 @@ Organisation
     You are a Organiser
     <br>
     {{ organisation }}
+    {% for tournament in tournaments %}
+    <p>{{ tournament.name}}</p>
+    <p>{{ tournament.game}}</p>
+    <br>
+    {% endfor %}
 {% endblock body %}

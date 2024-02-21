@@ -16,3 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
         
+class TournamentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tournament
+        fields = '__all__'
+        depth = 1

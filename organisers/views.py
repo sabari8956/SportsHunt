@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from utils import *
-from api.serializer import OrganisationSerializer
+from api.serializer import OrganisationSerializer, TournamentSerializer
 from .models import *
 from .forms import *
 from .decorators import organiser_required
@@ -22,8 +22,11 @@ def index(req):
         req.session["organisation"] = None
         return redirect("organisers:orgs")
     
+    tourns = Tournament.objects.filter(org= organisation)
+    tournament_serializer = TournamentSerializer(tourns, many=True)
     return render(req, "organisers/organiser_index.html", {
-        "organisation": serializer.data
+        "organisation": serializer.data,
+        "tournaments": tournament_serializer.data
     })
 
 @organiser_required

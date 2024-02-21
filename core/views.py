@@ -86,3 +86,20 @@ def organisation_view(req, org_name):
     return render(req, "core/organisation.html", {
         "org_data": serializer.data,
     })
+    
+def organisation_tournament_view(req, org_name, tournament_name):
+    org = Organisation.objects.get(name=org_name)
+    if not org:
+        return render(req, "errors/organisation_not_found.html", {
+            "org_name": org_name,
+        })
+    
+    tournament = Tournament.objects.get(name=tournament_name)
+    serializer = TournamentSerializer(tournament, many=False)
+    if not tournament or tournament.org != org:
+        return render(req, "errors/tournament_not_found.html", {
+            "tournament_name": tournament_name,
+        })
+    return render(req, "core/tournament.html", {
+        "tournament_data": serializer.data,
+    })
