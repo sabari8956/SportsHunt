@@ -5,6 +5,7 @@ from .models import *
 from organisers.models import *
 from api.serializer import *
 from django.db import IntegrityError
+from django.contrib import messages
 
 # Create your views here.
 def index(req):
@@ -41,19 +42,23 @@ def register_view(req):
         password = req.POST["password"]
         confirmation = req.POST["confirmation"]
         if not username:
+            messages.add_message(req, messages.ERROR, 'Enter a Valid Username')
             return render(req, "auth/register.html", {
                 "message": "Enter a Valid Username"
             })        
         if password != confirmation:
+            messages.add_message(req, messages.ERROR, 'Passwords must match.')
             return render(req, "auth/register.html", {
                 "message": "Passwords must match."
             })
         if User.objects.filter(username=username).exists():
+            messages.add_message(req, messages.ERROR, 'Username already taken.')
             return render(req, "auth/register.html", {
                 "message": "Username already taken."
             })
             
         elif User.objects.filter(email=email).exists():
+            messages.add_message(req, messages.ERROR, 'Email already registed')
             return render(req, "auth/register.html", {
                 "message": "Email already registed"
             })

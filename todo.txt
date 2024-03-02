@@ -1,5 +1,7 @@
-Tasks
-    -> new decorator (organiser_required)
-    -> Clean Template
-    -> convert forms to form.py
+Login Page Template Redesign ✅
+Registration ✅
+tournament's all forms need a redesign ✅
+
+Dark Theme 
+    Just add the bit of js that will do.✅ [Kinda]
     
