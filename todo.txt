@@ -1,7 +1,14 @@
-Login Page Template Redesign ✅
-Registration ✅
-tournament's all forms need a redesign ✅
+Todo Tasks 
+    - simple ui/ux on details of the tournament
+    - create catagory
+        - model
+        - views fn
+        - form
 
-Dark Theme 
-    Just add the bit of js that will do.✅ [Kinda]
-    
+
+
+Addtional features 
+    in organisation/views.py 
+        index fn 
+        we can return a detailed and short data of tournament, sort it by upcoming and completed 
+        limit it to only 2, 3 depending on the card and more button if there are more.
