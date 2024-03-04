@@ -1,10 +1,13 @@
 Todo Tasks 
     - simple ui/ux on details of the tournament
     - create catagory
-        - model
-        - views fn
-        - form
+        - model✅
+        - views fn✅
+        - form ✅
 
+    - add default values to it.
+    
+    *Then we can go for adding matches and assigning them*
 
 
 Addtional features 
