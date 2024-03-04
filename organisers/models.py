@@ -50,6 +50,7 @@ class Game(models.Model):
 
 class Category(models.Model):
     catagory_type = models.CharField('catogory type', max_length=254)
+    details = models.CharField('catogory details', max_length=254, blank= True)
     max_age = models.IntegerField()
     price = models.IntegerField(default=0)
     

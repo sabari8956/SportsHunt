@@ -6,4 +6,6 @@ Tournament
 
 {% block body %}
 {{ tournament_data }}
+<br>
+<a href="{% url 'organisers:categories' tournament_name=tournament_data.name %}">Add Categories </a>
 {% endblock body %}

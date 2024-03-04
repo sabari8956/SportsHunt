@@ -86,3 +86,37 @@ def tournament_creation_form(req):
     return render(req, "organisers/tournament_form.html",{
         "form": TournamentForm(),
     })
+
+@organiser_required
+def create_categories(req, tournament_name):
+    tournament = Tournament.objects.get(name=tournament_name)
+    if not tournament:
+        messages.add_message(req, messages.ERROR, 'No Such Tournament Found.')
+        return redirect("organisers:index")
+    serializer = TournamentSerializer(tournament, many=False)
+    
+    if not (req.user.id == serializer.data["org"]["admin"] or req.user.id in serializer.data["org"]["mods"]):
+        messages.add_message(req, messages.ERROR, 'You are not authorised to create categories.')
+        return redirect("organisers:index")
+    cats = [c["catagory_type"] for c in serializer.data["categories"]]
+    print(cats)
+    if req.POST:
+        form = CategoriesForm(req.POST)
+        if form.is_valid():
+            if form.cleaned_data["catagory_type"] in cats:
+                print("Category already exists")
+                messages.add_message(req, messages.ERROR, 'Category already exists.')
+                return render(req, r"organisers\create_catogry_form.html", {
+                    "form": form ,
+                })
+            else:
+                cat = form.save()
+                tournament.categories.add(cat)
+            return redirect("organisers:index")
+        return render(req, r"organisers\create_catogry_form.html", {
+            "form": form 
+            })
+
+    return render(req, r"organisers\create_catogry_form.html",{
+        "form": CategoriesForm(),
+    })

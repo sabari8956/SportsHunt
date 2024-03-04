@@ -65,3 +65,16 @@ class TournamentForm(forms.Form):
         if commit:
             tournament.save()
         return tournament
+    
+
+class CategoriesForm(forms.Form):
+    catagory_type = forms.CharField(max_length=100, label="Catagory Type")
+    details = forms.CharField(max_length=254, label="Details")
+    max_age = forms.IntegerField(label="Max Age")
+    price = forms.IntegerField(label="Price")
+    
+    def save(self, commit=True):
+        cat = Category(**self.cleaned_data)
+        if commit:
+            cat.save()
+        return cat

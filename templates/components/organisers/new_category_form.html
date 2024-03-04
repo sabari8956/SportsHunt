@@ -1,0 +1,30 @@
+{% load widget_tweaks %}
+
+<div class="col-md-4 offset-md-4 form-group">
+    <form action="" method="post" class="max-w-sm mx-auto">
+        {% csrf_token %}
+        <div class="mb-5">
+            <label for="{{ form.catagory_type.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-dark">{{ form.catagory_type.label }}</label>
+            {{ form.catagory_type|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" }}
+        </div>
+        <div class="mb-5">
+            <label for="{{ form.details.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-dark">{{ form.details.label }}</label>
+            {{ form.details|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" }}
+        </div>
+        <div class="mb-5">
+            <label for="{{ form.max_age.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-dark">{{ form.max_age.label }}</label>
+            {{ form.max_age|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" }}
+        </div>
+        <div class="mb-5">
+            <label for="{{ form.price.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-dark">{{ form.price.label }}</label>
+            {{ form.price|add_class:"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" }}
+        </div>
+        <div class="flex items-start mb-5">
+            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save Category</button>
+        </div>
+    </form>
+    <br>
+
+    
+    <a href="{% url 'organisers:index' %}">I'll Create it Later</a>
+</div>
