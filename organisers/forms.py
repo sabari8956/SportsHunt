@@ -1,5 +1,5 @@
 from django import forms
-from .models import Organisation, Tournament
+from .models import Organisation, Tournament, Game, Category
 
 class OrganaisationForm(forms.Form):
     name = forms.CharField(max_length=100, label="Organisation Name")
@@ -34,7 +34,7 @@ class TournamentForm(forms.Form):
     name = forms.CharField(max_length=100, label="Tournament Name")
     start_date = forms.DateField(label="Start Date" )
     end_date = forms.DateField(label="End Date")
-    game = forms.ChoiceField(choices=[('Badminton', 'badminton'), ('Tennis', 'tennis')], label="Game")
+    game = forms.ModelChoiceField(queryset=Game.objects.all(), label="Game")
     
     def clean_name(self):
         name = self.cleaned_data['name'].lower().replace(" ", "_")

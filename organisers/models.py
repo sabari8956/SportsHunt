@@ -28,11 +28,8 @@ class Tournament(models.Model):
     mods = models.ManyToManyField(User, related_name='tournament_mod', blank= True)
     start_date = models.DateField()
     end_date = models.DateField()
-    GAMES = [
-        ('Badminton', 'badminton'),
-        ('Tennis', 'tennis'),
-    ]
-    game = models.CharField('game type', max_length=254, choices=GAMES, default='Badminton')
+    game = models.ForeignKey('Game', on_delete=models.CASCADE)
+    categories = models.ManyToManyField('Category', related_name='tournament_catagory', blank= True)
     
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(" ", "_")
@@ -43,3 +40,18 @@ class Tournament(models.Model):
     
     def __str__(self) -> str:
         return f"{self.name}"
+    
+class Game(models.Model):
+    game_type = models.CharField('game type', max_length=254)
+    default_categories = models.ManyToManyField('Category', related_name='game_catagory', blank= True)
+    
+    def __str__(self) -> str:
+        return f"{self.game_type}"
+
+class Category(models.Model):
+    catagory_type = models.CharField('catogory type', max_length=254)
+    max_age = models.IntegerField()
+    price = models.IntegerField(default=0)
+    
+    def __str__(self) -> str:
+        return f"{self.catagory_type}"
