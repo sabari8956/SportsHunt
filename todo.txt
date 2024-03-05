@@ -9,6 +9,34 @@ Todo Tasks
     
     *Then we can go for adding matches and assigning them*
 
+    Matches
+        - create extra fields in categories model
+            - for storing all the teams [ many 2 many]
+            - store fixture [ forign key ]
+            - a field to say how many ppls in a team 
+        
+        - way to normal users to join a tournament
+            
+        - create a new model for fixtures
+            - matches [many 2 many rel with match model( Pending )]
+            - winner, runner
+
+        - create matches model
+            - team A [ store a team fk key]
+            - team B [ store a team fk key]
+            - winner
+            - Score board [ many 2 many (as it can contain many sets )]
+            - Sets 
+        
+        - create Score board Model
+            - Score_A 
+            - Score_B
+            - team A 
+            - team B 
+
+
+
+
 
 Addtional features 
     in organisation/views.py 
