@@ -24,6 +24,7 @@ def index(req):
     
     tourns = Tournament.objects.filter(org= organisation)
     tournament_serializer = TournamentSerializer(tourns, many=True)
+    print(tournament_serializer.data)
     return render(req, "organisers/organiser_index.html", {
         "organisation": serializer.data,
         "tournaments": tournament_serializer.data

@@ -33,9 +33,12 @@ class Tournament(models.Model):
     
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(" ", "_")
-        if self.name in [tour.name for tour in Tournament.objects.all()]:
-            raise ValidationError("Tournament name already exists.")
-        
+        if self.pk:
+            if Tournament.objects.filter(name=self.name).exclude(pk=self.pk).exists():
+                raise ValidationError("Tournament name already exists.")
+        else:
+            if Tournament.objects.filter(name=self.name).exists():
+                raise ValidationError("Tournament name already exists.")
         super().save(*args, **kwargs)
     
     def __str__(self) -> str:
@@ -53,6 +56,35 @@ class Category(models.Model):
     details = models.CharField('catogory details', max_length=254, blank= True)
     max_age = models.IntegerField()
     price = models.IntegerField(default=0)
+    team_size = models.IntegerField(default=1)
+    teams = models.ManyToManyField('Team', related_name='category_team', blank= True)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    fixture = models.ManyToManyField('Match', related_name='category_fixture', blank= True)
     
     def __str__(self) -> str:
-        return f"{self.catagory_type}"
+        return f"{self.tournament} -> {self.catagory_type}"
+    
+class Team(models.Model):
+    members = models.ManyToManyField(User, related_name='team_members', blank= True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    def save(self, *args, **kwargs):
+        # if len(self.members.all()) > self.category.team_size:
+        #     raise ValidationError("Team size exceeded.")
+        super().save(*args, **kwargs)
+    
+    def __str__(self) -> str:
+        return f"{self.category.tournament.name}>{self.category.catagory_type} -- {[mem.username for mem in self.members.all()]}"
+    
+class Match(models.Model):
+    match_no = models.IntegerField(null=True, blank=True)
+    team1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team1')
+    team2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team2')
+    winner = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='winner', blank=True, null=True)
+    loser = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='loser', blank=True, null=True)
+    match_state = models.BooleanField(default=False)
+    sets = models.IntegerField(default=1)
+    # sets_scores = TODO later
+    
+    def __str__(self) -> str:
+        return f"{self.team1} vs {self.team2}"
+
