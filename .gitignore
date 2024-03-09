@@ -12,3 +12,6 @@ __pycache__/
 
 # ignoring db 
 db.sqlite3
+
+# Ignoring old_migration files
+./old_mig_files/
