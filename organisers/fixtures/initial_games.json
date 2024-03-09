@@ -1,0 +1,23 @@
+[
+    {
+      "model": "organisers.Game",
+      "pk": 1,
+      "fields": {
+        "game_type": "Badminton"
+      }
+    },
+    {
+      "model": "organisers.Game",
+      "pk": 2,
+      "fields": {
+        "game_type": "Tennis"
+      }
+    },
+    {
+      "model": "organisers.Game",
+      "pk": 3,
+      "fields": {
+        "game_type": "Basketball"
+      }
+    }
+  ]
