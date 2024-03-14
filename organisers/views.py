@@ -111,7 +111,8 @@ def create_categories(req, tournament_name):
                     "form": form ,
                 })
             else:
-                cat = form.save()
+                
+                cat = form.save(tournament=tournament)
                 tournament.categories.add(cat)
             return redirect("organisers:index")
         return render(req, r"organisers\create_catogry_form.html", {

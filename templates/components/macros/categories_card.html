@@ -1,0 +1,21 @@
+
+
+<div class="flow-root">
+    <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+        <li class="py-3 sm:py-4">
+            <div class="flex items-center">
+                <div class="flex-1 min-w-0 ms-4">
+                    <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                        {{ category.catagory_type }}
+                    </p>
+                    <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                        {{ category.details }}
+                    </p>
+                </div>
+                <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                    ₹{{ category.price }}
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,16 @@
+
+<div class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Details</h2>
+    <address class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-2">
+        <div class="space-y-2 text-gray-500 dark:text-gray-400 leading-loose hidden sm:block">
+            Organisers <br />
+            Date <br />
+            Venue
+        </div>
+        <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
+            <a href="{% url 'core:organisation' org_name=tournament_data.org.name  %}">{{ tournament_data.org.name }} </a> <br />
+            {{ tournament_data.start_date }} to {{ tournament_data.end_date }} <br />
+            {{ tournament_data.venue }}
+        </div>
+    </address>
+</div>

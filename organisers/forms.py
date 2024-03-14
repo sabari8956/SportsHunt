@@ -73,8 +73,10 @@ class CategoriesForm(forms.Form):
     max_age = forms.IntegerField(label="Max Age")
     price = forms.IntegerField(label="Price")
     
-    def save(self, commit=True):
-        cat = Category(**self.cleaned_data)
+    def save(self, tournament, commit=True):
+        cat = Category(**self.cleaned_data, tournament=tournament)
+        if not tournament:
+            raise Exception("Tournament is needed")
         if commit:
             cat.save()
         return cat

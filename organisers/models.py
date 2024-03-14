@@ -30,6 +30,7 @@ class Tournament(models.Model):
     end_date = models.DateField()
     game = models.ForeignKey('Game', on_delete=models.CASCADE)
     categories = models.ManyToManyField('Category', related_name='tournament_catagory', blank= True)
+    venue = models.CharField('Venue', max_length=254, default="TBA")
     
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(" ", "_")
