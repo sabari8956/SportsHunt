@@ -39,3 +39,9 @@ class TournamentSerializer(serializers.ModelSerializer):
         model = Tournament
         fields = '__all__'
         depth = 1
+        
+class cartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['cart']
+        depth = 1

@@ -8,3 +8,4 @@ class User(AbstractUser):
     is_organiser = models.BooleanField('organizer status', default=False)
     email = models.EmailField(max_length=254, blank= False, unique=True)
     name = models.CharField('full name', max_length=254)
+    cart = models.ForeignKey('organisers.Team', on_delete=models.SET_NULL, null=True, blank=True)

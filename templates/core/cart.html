@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}
+Cart
+{% endblock title %}
+
+{% block body %}
+  Helo
+
+  <div>
+    {% for team in cart %}
+      {{ team.name }}
+      {{ team.price }}
+      {{ team.category }}
+        <br><br><br>
+    {% endfor %}
+  </div>
+{% endblock body %}

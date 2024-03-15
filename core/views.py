@@ -8,6 +8,7 @@ from django.db import IntegrityError
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 def index(req):
     messages = req._messages
@@ -113,4 +114,12 @@ def organisation_tournament_view(req, org_name, tournament_name):
         })
     return render(req, "core/tournament.html", {
         "tournament_data": serializer.data,
+    })
+
+@login_required
+def cart_view(req):
+    cart = cartSerializer(req.user, many=False)
+    print(cart.data)
+    return render(req, "core/cart.html", {
+        "cart": cart.data,
     })
