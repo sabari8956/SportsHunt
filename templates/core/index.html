@@ -17,4 +17,8 @@ Home
     <a href="{% url 'core:login' %}">Login</a>
     <a href="{% url 'core:register' %}">register</a>
 {% endif %}
+
+{% for up_coming in upcoming_tournaments %}
+    {% include "components\macros\tournament_card.html" with tournament_data=up_coming %}
+{% endfor %}
 {% endblock body %}

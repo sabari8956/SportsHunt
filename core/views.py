@@ -6,12 +6,18 @@ from organisers.models import *
 from api.serializer import *
 from django.db import IntegrityError
 from django.contrib import messages
-
+from django.utils import timezone
+from datetime import timedelta
 # Create your views here.
 def index(req):
     messages = req._messages
+    now = timezone.now()
+    end_date = now + timedelta(days=15)
+    upcoming_tournaments = Tournament.objects.filter(start_date__range=(now, end_date)).order_by('start_date')[:5]
+    print(upcoming_tournaments)
     return render(req, "core/index.html", {
         "messages":messages,
+        "upcoming_tournaments": upcoming_tournaments,
     })
 
 def login_view(req):
