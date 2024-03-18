@@ -64,9 +64,11 @@ class Category(models.Model):
     
     def __str__(self) -> str:
         return f"{self.tournament} -> {self.catagory_type}"
-    
+
+class Player(models.Model):
+    name = models.CharField('player name', max_length=254)
 class Team(models.Model):
-    members = models.ManyToManyField(User, related_name='team_members', blank= True)
+    members = models.ManyToManyField(Player, related_name='team_members', blank= True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     def save(self, *args, **kwargs):
         # if len(self.members.all()) > self.category.team_size:
@@ -74,7 +76,7 @@ class Team(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self) -> str:
-        return f"{self.category.tournament.name}>{self.category.catagory_type} -- {[mem.username for mem in self.members.all()]}"
+        return f"{self.category.tournament.name}>{self.category.catagory_type} -- {[mem.name for mem in self.members.all()]}"
     
 class Match(models.Model):
     match_no = models.IntegerField(null=True, blank=True)

@@ -24,11 +24,21 @@ def OrganisationApi(req):
     # return Response(serializers.data)
     return redirect('core:index')
 
-@api_view(["GET","POST"])
+@api_view(["POST"])
 def add_to_cart(req):
     if not req.user.is_authenticated:
         return Response({"error": "You are not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
     data = req.data
-    print(data)
-    messages.add_message(req, messages.WARNING, "added to cart successfully")
+    name_fields = [value for key, value in data.lists() if key.startswith('name_')]
+    players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
+    category_instance = Category.objects.get(id= int(data['category'][0]))
+    team_size= category_instance.team_size
+    if len(players_instances) != team_size:
+        return Response({"error": f"Team size must be {team_size}"}, status=status.HTTP_400_BAD_REQUEST)
+    team_instance = Team.objects.create(category= category_instance)
+    team_instance.members.set(players_instances)
+    
+    user_instance = User.objects.get(username= req.user)
+    user_instance.cart.add(team_instance)
+    messages.add_message(req, messages.SUCCESS, "added to cart successfully")
     return Response({"message": data}, status=status.HTTP_200_OK)

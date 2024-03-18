@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required
+from organisers.forms import *
 # Create your views here.
 def index(req):
     messages = req._messages
@@ -108,18 +109,29 @@ def organisation_tournament_view(req, org_name, tournament_name):
     
     tournament = Tournament.objects.get(name=tournament_name)
     serializer = TournamentSerializer(tournament, many=False)
+    # team_size = serializer.data["categories"][0]["team_size"]
     if not tournament or tournament.org != org:
         return render(req, "errors/tournament_not_found.html", {
             "tournament_name": tournament_name,
         })
     return render(req, "core/tournament.html", {
         "tournament_data": serializer.data,
+        # "team_size": range(1,team_size+1),
     })
 
 @login_required
 def cart_view(req):
-    cart = cartSerializer(req.user, many=False)
-    print(cart.data)
+    user = User.objects.get(username=req.user)
+    cart = user.cart.all()
+    cart_data = []
+    total = 0
+    for item in cart:
+        item_dict = {}
+        item_dict["members"] = item.members.all()
+        item_dict["category"] = item.category
+        cart_data.append(item_dict)
+        total += item.category.price
     return render(req, "core/cart.html", {
-        "cart": cart.data,
+        "cart": cart_data,
+        "total":total,
     })
