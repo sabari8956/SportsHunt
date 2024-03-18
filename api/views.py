@@ -31,7 +31,7 @@ def add_to_cart(req):
     data = req.data
     name_fields = [value for key, value in data.lists() if key.startswith('name_')]
     players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
-    category_instance = Category.objects.get(id= int(data['category'][0]))
+    category_instance = Category.objects.get(id= int(data['category']))
     team_size= category_instance.team_size
     if len(players_instances) != team_size:
         return Response({"error": f"Team size must be {team_size}"}, status=status.HTTP_400_BAD_REQUEST)
