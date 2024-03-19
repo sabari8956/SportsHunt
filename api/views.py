@@ -6,7 +6,7 @@ from core.models import *
 from .serializer import *
 from django.shortcuts import redirect
 from django.contrib import messages
-
+from django.contrib.auth.decorators import login_required
 
 @api_view(["GET", "POST"])
 def OrganisationApi(req):
@@ -24,10 +24,9 @@ def OrganisationApi(req):
     # return Response(serializers.data)
     return redirect('core:index')
 
+@login_required
 @api_view(["POST"])
 def add_to_cart(req):
-    if not req.user.is_authenticated:
-        return Response({"error": "You are not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
     data = req.data
     name_fields = [value for key, value in data.lists() if key.startswith('name_')]
     players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
@@ -42,3 +41,13 @@ def add_to_cart(req):
     user_instance.cart.add(team_instance)
     messages.add_message(req, messages.SUCCESS, "added to cart successfully")
     return Response({"message": data}, status=status.HTTP_200_OK)
+
+@login_required
+@api_view(["POST"])
+def checkout(req):
+    user_instance = User.objects.get(username= req.user)
+    cart_data = user_instance.cart.all()
+    for item in cart_data:
+        item.category.teams.add(item)
+    user_instance.cart.remove(*cart_data)
+    return Response({"message": "Checkout was  successfully"}, status=status.HTTP_200_OK)
