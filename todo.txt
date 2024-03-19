@@ -1,5 +1,5 @@
 Todo
     - create two pages like for players and orgs 
-        - edit the existing page 
+        - edit the existing page ✅
     - create a tournament_page for owners, mods
     - 
