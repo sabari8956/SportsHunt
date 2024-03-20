@@ -5,7 +5,7 @@ from utils import *
 from api.serializer import OrganisationSerializer, TournamentSerializer
 from .models import *
 from .forms import *
-from .decorators import organiser_required
+from .decorators import organiser_required, host_required
 # Create your views here.
 
 @organiser_required
@@ -100,7 +100,6 @@ def create_categories(req, tournament_name):
         messages.add_message(req, messages.ERROR, 'You are not authorised to create categories.')
         return redirect("organisers:index")
     cats = [c["catagory_type"] for c in serializer.data["categories"]]
-    print(cats)
     if req.POST:
         form = CategoriesForm(req.POST)
         if form.is_valid():
@@ -121,4 +120,17 @@ def create_categories(req, tournament_name):
 
     return render(req, r"organisers\create_catogry_form.html",{
         "form": CategoriesForm(),
+    })
+
+@host_required
+def org_tournament_view(req, tournament_name):
+    if not (Tournament.objects.filter(name=tournament_name).exists()):
+        return render(req, "errors/tournament_not_found.html", {
+            "tournament_name": tournament_name, 
+        })
+    tournament = Tournament.objects.get(name=tournament_name)
+    serializer = TournamentSerializer(tournament, many=False)
+    
+    return render(req, "organisers/org_tournament_view.html", {
+        "tournament_data": serializer.data,
     })
