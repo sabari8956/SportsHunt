@@ -130,7 +130,8 @@ def org_tournament_view(req, tournament_name):
         })
     tournament = Tournament.objects.get(name=tournament_name)
     serializer = TournamentSerializer(tournament, many=False)
-    
+    print(serializer.data["categories"][0]["teams"])
     return render(req, "organisers/org_tournament_view.html", {
         "tournament_data": serializer.data,
+        "n_categories": range(len(serializer.data["categories"])),
     })
