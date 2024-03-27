@@ -112,19 +112,3 @@ while fixture.currentStage != 0:
     print(f"Current bracket winners: {fixture.currentWinners}")
     
     fixture.nextBracket(fixture.currentWinners)
-
-
-"""
-Ready to resume plan
-
-the current problems are
-    1. doesn't work for odd number of teams for some reason [9]✅
-    2. a issue is that if 3 teams are in semi finals [1,2,3] and 
-        [1,2] plays 3 gets bye, then 3 will be in finals without playing a match✅
-        
-    3. whatif a team plays with same team again and again?[wrong question, it's not possible]
-    4. whatif a team gets bye in every stage?✅
-    
-    MAIN ISSUE: 
-        As of now i have code that BYE plays with BYE in stages that a bad idea [indeed it was a bad idea]
-"""
