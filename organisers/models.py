@@ -60,7 +60,7 @@ class Category(models.Model):
     team_size = models.IntegerField(default=1)
     teams = models.ManyToManyField('Team', related_name='category_team', blank= True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
-    fixture = models.ManyToManyField('Match', related_name='category_fixture', blank= True)
+    fixture = models.ForeignKey('Fixtures', on_delete=models.CASCADE, related_name="this_fixture", blank= True, null= True)
     
     def __str__(self) -> str:
         return f"{self.tournament} -> {self.catagory_type}"
@@ -90,4 +90,14 @@ class Match(models.Model):
     
     def __str__(self) -> str:
         return f"{self.team1} vs {self.team2}"
-
+    
+class Fixtures(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="fixtures_category")
+    fixture = models.JSONField(blank=True)
+    winners_stages = models.JSONField(blank=True)
+    currentStage = models.IntegerField(default=0)
+    currentBracket = models.ManyToManyField(Match, related_name='current_bracket', blank= True)
+    currentWinners = models.ManyToManyField(Team, related_name='current_winners', blank= True)
+    
+    def __str__(self) -> str:
+        return f"{self.category}"
