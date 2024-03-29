@@ -61,7 +61,10 @@ class Category(models.Model):
     teams = models.ManyToManyField('Team', related_name='category_team', blank= True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     fixture = models.ForeignKey('Fixtures', on_delete=models.SET_NULL, related_name="this_fixture", blank= True, null= True)
-    
+    # add more fields later
+        # date specific for tournament
+        # fixture_type [ knockout, league, round-robin, etc.]
+        
     def __str__(self) -> str:
         return f"{self.tournament} -> {self.catagory_type}"
 
