@@ -1,10 +1,6 @@
-Ready to resume plan
 
-1. Create a model for fixture
-    1.1 think of cols like stage, initial bracket, winners of stage etc...
-        1.1.1 possibly we have to create another model for each stage
-2. Connect the algo with the model
-    2.1 like when giving all the data needed for calculations.
-
-3. Create a view
-    
+1] add all the self bracket, winner data to the fixture instance✅
+    Now automatically call nextBracket if no more teams in curent bracket,✅
+2] update nextBracket to use with db✅
+3] update add_winners to use with db✅
+4] update api/views.py to use the fixture generator properly.✅
