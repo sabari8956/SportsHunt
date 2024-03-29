@@ -1,6 +1,9 @@
-
-1] add all the self bracket, winner data to the fixture instance✅
-    Now automatically call nextBracket if no more teams in curent bracket,✅
-2] update nextBracket to use with db✅
-3] update add_winners to use with db✅
-4] update api/views.py to use the fixture generator properly.✅
+TODO
+    - format all the stages and matches in json format and save it
+    - create a seprate page for category
+    - add all the features in the page 
+        - players, match stage, winner [ if over ]
+        - create fixture
+        - show scheduled match
+        - view fixture [graph]
+    
