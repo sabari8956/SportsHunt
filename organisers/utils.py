@@ -121,27 +121,3 @@ class knockoutFixtureGenerator:
             print('going to next bracket')
             self.nextBracket(fixture_instance.id)
         return status
-
-if __name__ == "__main__":
-    fixture = knockoutFixtureGenerator()
-    fixture.initialBracket([1,2,3,4,5,6,7,8,9])
-
-    while fixture.currentStage != 0:
-        while fixture.bracket:
-            n = int(input("Enter winner: "))
-            fixture.add_winners(n)
-            if not fixture.bracket:
-                break
-                
-        fixture.nextBracket(fixture.currentWinners)
-
-
-        """
-        next plan
-        
-        1] add all the self bracket, winner data to the fixture instance✅
-            Now automatically call nextBracket if no more teams in curent bracket,✅
-        2] update nextBracket to use with db✅
-        3] update add_winners to use with db✅
-        4] update api/views.py to use the fixture generator properly.✅
-        """
