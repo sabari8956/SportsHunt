@@ -28,7 +28,7 @@ class Tournament(models.Model):
     mods = models.ManyToManyField(User, related_name='tournament_mod', blank= True)
     start_date = models.DateField()
     end_date = models.DateField()
-    game = models.ForeignKey('Game', on_delete=models.CASCADE)
+    game = models.ForeignKey('Game', on_delete=models.SET_NULL, related_name='tournament_game', blank= True, null= True)
     categories = models.ManyToManyField('Category', related_name='tournament_catagory', blank= True)
     venue = models.CharField('Venue', max_length=254, default="TBA")
     
@@ -60,7 +60,7 @@ class Category(models.Model):
     team_size = models.IntegerField(default=1)
     teams = models.ManyToManyField('Team', related_name='category_team', blank= True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
-    fixture = models.ForeignKey('Fixtures', on_delete=models.CASCADE, related_name="this_fixture", blank= True, null= True)
+    fixture = models.ForeignKey('Fixtures', on_delete=models.SET_NULL, related_name="this_fixture", blank= True, null= True)
     
     def __str__(self) -> str:
         return f"{self.tournament} -> {self.catagory_type}"
@@ -80,8 +80,9 @@ class Team(models.Model):
     
 class Match(models.Model):
     match_no = models.IntegerField(null=True, blank=True)
+    match_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='match_category', blank= True, null= True)# have to change blank and null to false
     team1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team1')
-    team2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team2')
+    team2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team2', null= True, blank= True)
     winner = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='winner', blank=True, null=True)
     loser = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='loser', blank=True, null=True)
     match_state = models.BooleanField(default=False)
@@ -92,12 +93,12 @@ class Match(models.Model):
         return f"{self.team1} vs {self.team2}"
     
 class Fixtures(models.Model):
+    status = models.BooleanField(default=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="fixtures_category")
-    fixture = models.JSONField(blank=True)
-    winners_stages = models.JSONField(blank=True)
+    fixture = models.JSONField(blank=True, null=True)
+    winners_stages = models.JSONField(blank=True, null=True)
     currentStage = models.IntegerField(default=0)
     currentBracket = models.ManyToManyField(Match, related_name='current_bracket', blank= True)
     currentWinners = models.ManyToManyField(Team, related_name='current_winners', blank= True)
-    
     def __str__(self) -> str:
-        return f"{self.category}"
+        return f"{self.category} {self.id}"

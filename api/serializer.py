@@ -45,3 +45,9 @@ class cartSerializer(serializers.ModelSerializer):
         model = User
         fields = ['cart']
         depth = 1
+        
+class fixtureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fixtures
+        fields = '__all__'
+        depth = 1
