@@ -24,7 +24,6 @@ def index(req):
     
     tourns = Tournament.objects.filter(org= organisation)
     tournament_serializer = TournamentSerializer(tourns, many=True)
-    print(tournament_serializer.data)
     return render(req, "organisers/organiser_index.html", {
         "organisation": serializer.data,
         "tournaments": tournament_serializer.data
@@ -104,7 +103,6 @@ def create_categories(req, tournament_name):
         form = CategoriesForm(req.POST)
         if form.is_valid():
             if form.cleaned_data["catagory_type"] in cats:
-                print("Category already exists")
                 messages.add_message(req, messages.ERROR, 'Category already exists.')
                 return render(req, r"organisers\create_catogry_form.html", {
                     "form": form ,
@@ -130,7 +128,6 @@ def org_tournament_view(req, tournament_name):
         })
     tournament = Tournament.objects.get(name=tournament_name)
     serializer = TournamentSerializer(tournament, many=False)
-    print(serializer.data["categories"][0]["teams"])
     return render(req, "organisers/org_tournament_view.html", {
         "tournament_data": serializer.data,
         "n_categories": range(len(serializer.data["categories"])),
