@@ -79,8 +79,10 @@ def create_fixture(req, tournament_name, category_name):
        status=status.HTTP_200_OK)    
     
 @host_required
-@api_view(["GET", "POST"])
-def update_winner(req, tournament_name, category_name, winner_team_id):
+@api_view(["POST"])
+def update_winner(req, tournament_name, category_name):
+    winner_team_id = int(req.data.get('winner_team_id'))
+    print(winner_team_id)
     if not (Tournament.objects.filter(name= tournament_name).exists() and category_name in Tournament.objects.get(name= tournament_name).categories.all().values_list('catagory_type', flat=True)):
         return Response({"error": "Tournament or Category not found"}, status=status.HTTP_404_NOT_FOUND)
 

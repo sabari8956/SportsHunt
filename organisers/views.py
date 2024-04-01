@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from utils import *
-from api.serializer import OrganisationSerializer, TournamentSerializer
+from api.serializer import *
 from .models import *
 from .forms import *
 from .decorators import organiser_required, host_required
@@ -89,15 +89,17 @@ def tournament_creation_form(req):
 
 @organiser_required
 def create_categories(req, tournament_name):
+    print("here")
     tournament = Tournament.objects.get(name=tournament_name)
     if not tournament:
+        print("here")
         messages.add_message(req, messages.ERROR, 'No Such Tournament Found.')
         return redirect("organisers:index")
     serializer = TournamentSerializer(tournament, many=False)
     
-    if not (req.user.id == serializer.data["org"]["admin"] or req.user.id in serializer.data["org"]["mods"]):
-        messages.add_message(req, messages.ERROR, 'You are not authorised to create categories.')
-        return redirect("organisers:index")
+    # if not (req.user.id == serializer.data["org"]["admin"] or req.user.id in serializer.data["org"]["mods"]):
+    #     messages.add_message(req, messages.ERROR, 'You are not authorised to create categories.')
+    #     return redirect("organisers:index")
     cats = [c["catagory_type"] for c in serializer.data["categories"]]
     if req.POST:
         form = CategoriesForm(req.POST)
@@ -132,3 +134,61 @@ def org_tournament_view(req, tournament_name):
         "tournament_data": serializer.data,
         "n_categories": range(len(serializer.data["categories"])),
     })
+
+@host_required
+def category_view(req, tournament_name, category_name):
+    if not (Tournament.objects.filter(name=tournament_name).exists()):
+        return render(req, "errors/tournament_not_found.html", {
+            "tournament_name": tournament_name, 
+        })
+    
+    if not (Tournament.objects.get(name=tournament_name).categories.filter(catagory_type=category_name).exists()):
+        return render(req, "errors/category_not_found.html", {
+            "category_name": category_name, 
+        })
+    
+    tournament_instance = Tournament.objects.get(name=tournament_name)
+    category_instance = tournament_instance.categories.get(catagory_type=category_name)
+    fixture_instance = category_instance.fixture
+    fixture_serializer = fixtureSerializer(fixture_instance)
+    teams = [[mem.name for mem in team.members.all()] for team in category_instance.teams.all()] 
+    fixture_data = FixtureSerializer(fixture_instance, many=False).data
+    fixture_brackets = []
+    fixture_brackets_serialized = []
+    
+    if fixture_serializer.data.get("currentBracket"):
+        fixture_brackets_serialized = fixture_serializer.data["currentBracket"]
+        
+    for match in fixture_brackets_serialized:
+        match_serializer = matchSerializer(Match.objects.get(id=match["id"]))
+        fixture_brackets.append(match_serializer.data)  
+    stages_dict = {
+        None: 'Not Started',
+        0: 'Completed',
+        1: 'Finals',
+        2: 'Semi Finals',
+        3: 'Quater Finals',
+        4: 'Round of 16',
+        5: 'Round of 32',
+    }
+    print(stages_dict[fixture_data["currentStage"]], fixture_data["currentStage"])
+    
+    winner = None
+    if fixture_data.get("currentWinners"):
+        winner = fixture_data["currentWinners"]
+        if len(winner) == 1:
+            winner = winner[0]
+    
+    data = {
+        "tournament_data": tournament_instance,
+        "category_data": category_instance,
+        "fixture_instance": fixture_instance,
+        "fixture_data": fixture_data,
+        "fixture_serializer": fixture_serializer.data,
+        "teams": teams,
+        "fixture_brackets": fixture_brackets,
+        "stage": stages_dict[fixture_data["currentStage"]],
+        "winner": winner,
+    }
+    
+    return render(req, "organisers/category.html", data)

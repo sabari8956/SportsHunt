@@ -1,0 +1,231 @@
+{% extends "organisers/base.html" %}
+
+{% block title %}
+{{ category_name }}
+{% endblock title %}
+
+{% block body %}
+<div>
+    <h1
+        class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+        {{ tournament_data.name }}, <small class="ms-2 font-semibold text-gray-500 dark:text-gray-400"> by {{ tournament_data.org.name }}</small></h1>
+    <span
+        class="bg-blue-100 text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ms-2">{{ tournament_data.game.game_type }}</span>
+    <span
+        class="bg-blue-100 text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ms-2">{{ category_data.catagory_type }}</span>
+</div>
+
+<div
+    class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Details</h2>
+    <address
+        class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-2">
+        <div class="space-y-2 text-gray-500 dark:text-gray-400 leading-loose hidden sm:block">
+            Fixture Type <br />
+            Team Size <br />
+            {% if fixture_data.currentStage  ==  0 %}
+                Winner
+            {% else %}
+                Stage
+            {% endif %}
+        </div>
+        <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
+            <a href="{% url 'core:organisation' org_name=tournament_data.org.name  %}"> Knockout [hard coded] </a>
+            <br />
+            {{ category_data.team_size }} <br>
+            {% if fixture_data.currentStage  ==  0 %}
+                {% for player in winner.members %}
+                  {{player.name}}
+                {% endfor %}
+            {% else %}
+                {{stage}}
+            {% endif %}
+        </div>
+    </address>
+</div>
+
+<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Players, </h2>
+<ul class="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-400">
+    {% for team in teams %}
+    <li class="flex items-center">
+        <svg class="w-3.5 h-3.5 me-2 text-gray-500 dark:text-gray-400 flex-shrink-0" aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path
+                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+        </svg>
+        {% for player in team %}
+        {{ player }}
+        {% endfor %}
+    </li>
+    {% endfor %}
+</ul>
+{% if not fixture_instance %}
+<form action="" method="post" id="create_fixture">
+    <button type="submit"
+        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Create
+        Fixture</button>
+</form>
+<script>
+    document.getElementById('create_fixture').addEventListener('submit', function (e) {
+        e.preventDefault();
+        let tournamentName = decodeURIComponent("{{ tournament_data.name|urlencode }}");
+        let categoryName = decodeURIComponent("{{ category_data.catagory_type|urlencode }}");
+        console.log(tournamentName, categoryName);
+        fetch(`api\${tournamentName}\${categoryName}\add_winner`, {
+            method: 'GET',
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(error => {
+                    console.log(error);
+                });
+            }
+            else {
+                location.reload();
+            }
+        }).catch(error => {
+            console.error('Fetch error:', error);
+        });
+    });
+</script>
+{% else %}
+    {% if fixture_data.currentStage  ==  0 %}
+    <div
+        class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">Winner</h2>
+        <div class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-1 items-center justify-center hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-500 dark:focus:text-white">
+          <div class="text-gray-900 dark:text-white font-medium leading-loose text-center">
+            {% for player in winner.members %}
+            {{ player.name }} <br>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+    <div
+        class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">Scheduled Matches</h2>
+        {% for match in fixture_data.currentBracket %}
+        <div
+            data-modal-target="select-modal-{{ forloop.counter }}" data-modal-toggle="select-modal-{{ forloop.counter }}" class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-3 items-center justify-center hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-500 dark:focus:text-white">
+
+            <div class="text-gray-900 dark:text-white font-medium leading-loose text-right pr-2">
+                {% for player in match.team1.members %}
+                {{ player.name }} <br>
+                {% endfor %}
+            </div>
+            <div class=" text-gray-900 dark:text-white font-medium leading-loose text-center">vs</div>
+            <div class="text-gray-900 dark:text-white font-medium leading-loose pl-2">
+                {% for player in match.team2.members %}
+                {{ player.name }} <br>
+                {% endfor %}
+            </div>
+        </div>
+
+  <!-- Main modal -->
+  <div id="select-modal-{{ forloop.counter }}" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Choose the winner
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="select-modal-{{ forloop.counter }}">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <p class="text-gray-500 dark:text-gray-400 mb-4">Select your desired position</p>
+                <ul class="space-y-4 mb-4">
+                    <li>
+                        <input type="radio" id="job-1" name="job-cnt-{{ forloop.counter }}" value="{{match.team1.id}}" class="hidden peer" required />
+                        <label for="job-1" class="inline-flex items-center justify-between w-full p-5 text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-500 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-900 hover:bg-gray-100 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">                           
+                            <div class="block">
+                                <div class="w-full text-lg font-semibold">Team A</div>
+                                <div class="w-full text-gray-500 dark:text-gray-400">
+                                    {% for player in match.team1.members %}
+                                    {{ player.name }} <br>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 ms-3 rtl:rotate-180 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/></svg>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" id="job-2" name="job-cnt-{{ forloop.counter }}" value="{{match.team2.id}}" class="hidden peer">
+                        <label for="job-2" class="inline-flex items-center justify-between w-full p-5 text-gray-900 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-500 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-900 hover:bg-gray-100 dark:text-white dark:bg-gray-600 dark:hover:bg-gray-500">
+                            <div class="block">
+                                <div class="w-full text-lg font-semibold">Team B</div>
+                                <div class="w-full text-gray-500 dark:text-gray-400">
+                                    {% for player in match.team2.members %}
+                                    {{ player.name }} <br>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 ms-3 rtl:rotate-180 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/></svg>
+                        </label>
+                    </li>
+                </ul>
+                <button onclick="add_winner('{{ forloop.counter }}')" class="text-white inline-flex w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div> 
+
+
+        <br>
+        {% endfor %}
+    </div>
+    <div class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-center">Qualifiers</h2>
+        {% for team in fixture_data.currentWinners %}
+        <div class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-1 items-center justify-center hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-500 dark:focus:text-white">
+          <div class="text-gray-900 dark:text-white font-medium leading-loose text-center">
+            {% for player in team.members %}
+            {{ player.name }} <br>
+            {% endfor %}
+          </div>
+        </div>
+        <br>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+{% endif %}
+
+<script>
+    function add_winner(loop_counter) {
+        const selectedRadio = document.querySelector(`input[name="job-cnt-${loop_counter}"]:checked`);
+        console.log(selectedRadio.value);
+        fetch("{% url 'api:add_winner' tournament_name=tournament_data.name category_name=category_data.catagory_type  %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'winner_team_id': selectedRadio.value
+            })
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(error => {
+                    console.log(error);
+                });
+            }
+            else {
+                location.reload();
+            }
+        }).catch(error => {
+            console.error('Fetch error:', error);
+        });
+    }
+</script>
+
+{% endblock body %}
