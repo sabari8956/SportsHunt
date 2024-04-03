@@ -161,7 +161,8 @@ def category_view(req, tournament_name, category_name):
         
     for match in fixture_brackets_serialized:
         match_serializer = matchSerializer(Match.objects.get(id=match["id"]))
-        fixture_brackets.append(match_serializer.data)  
+        fixture_brackets.append(match_serializer.data)
+        
     stages_dict = {
         None: 'Not Started',
         0: 'Completed',
@@ -189,6 +190,8 @@ def category_view(req, tournament_name, category_name):
         "fixture_brackets": fixture_brackets,
         "stage": stages_dict[fixture_data["currentStage"]],
         "winner": winner,
+        "ongoing_matches": None,
+        "upcoming_matches": None,
     }
     
     return render(req, "organisers/category.html", data)

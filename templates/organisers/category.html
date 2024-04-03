@@ -59,6 +59,7 @@
     </li>
     {% endfor %}
 </ul>
+{% include "components\organisers\category_add_to_cart.html" with selected_category=category_data %}
 {% if not fixture_instance %}
 <form action="" method="post" id="create_fixture">
     <button type="submit"
@@ -199,7 +200,7 @@
     {% endif %}
 
 {% endif %}
-
+{% include "components\organisers\category_tabs.html" %}
 <script>
     function add_winner(loop_counter) {
         const selectedRadio = document.querySelector(`input[name="job-cnt-${loop_counter}"]:checked`);

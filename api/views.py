@@ -25,21 +25,29 @@ def OrganisationApi(req):
     serializers = OrganisationSerializer(data, many=True)
     # return Response(serializers.data)
     return redirect('core:index')
-
 @login_required
 @api_view(["POST"])
 def add_to_cart(req):
     data = req.data
     name_fields = [value for key, value in data.lists() if key.startswith('name_')]
     players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
-    category_instance = Category.objects.get(id= int(data['category']))
-    team_size= category_instance.team_size
+
+    category_id = data.get('category')
+    if not category_id:
+        return Response({"error": "Category is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        category_instance = Category.objects.get(id=int(category_id))
+    except (ValueError, Category.DoesNotExist):
+        return Response({"error": "Invalid category ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+    team_size = category_instance.team_size
     if len(players_instances) != team_size:
         return Response({"error": f"Team size must be {team_size}"}, status=status.HTTP_400_BAD_REQUEST)
-    team_instance = Team.objects.create(category= category_instance)
+
+    team_instance = Team.objects.create(category=category_instance)
     team_instance.members.set(players_instances)
-    
-    user_instance = User.objects.get(username= req.user)
+    user_instance = User.objects.get(username=req.user)
     user_instance.cart.add(team_instance)
     messages.add_message(req, messages.SUCCESS, "added to cart successfully")
     return Response({"message": data}, status=status.HTTP_200_OK)
