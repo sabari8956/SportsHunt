@@ -191,7 +191,7 @@ def category_view(req, tournament_name, category_name):
         "stage": stages_dict[fixture_data["currentStage"]],
         "winner": winner,
         "ongoing_matches": None,
-        "upcoming_matches": None,
+        "upcoming_matches": fixture_data.get("currentBracket"),
     }
     
     return render(req, "organisers/category.html", data)

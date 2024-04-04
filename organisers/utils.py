@@ -101,17 +101,18 @@ class knockoutFixtureGenerator:
         return True
 
     def add_winners(self, fixture_id, winner):
+        print("still match has to be transfered to ongoing matches")
         fixture_instance = Fixtures.objects.get(id= fixture_id)
-        bracket = fixture_instance.currentBracket.all()
+        # bracket = fixture_instance.currentBracket.all()
+        tournament_instance = fixture_instance.category.tournament
+        onGoingMatches = tournament_instance.onGoing_matches.all()
         status = False
         
-        
-        
-        for match in bracket:
+        for match in onGoingMatches:
             if winner == match.team1.id or winner == match.team2.id:
                 status = True
                 fixture_instance.currentWinners.add(winner)
-                fixture_instance.currentBracket.remove(match)
+                tournament_instance.onGoing_matches.remove(match)
                 break
         
         if not status:

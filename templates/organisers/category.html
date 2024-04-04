@@ -72,7 +72,7 @@
         let tournamentName = decodeURIComponent("{{ tournament_data.name|urlencode }}");
         let categoryName = decodeURIComponent("{{ category_data.catagory_type|urlencode }}");
         console.log(tournamentName, categoryName);
-        fetch(`api\${tournamentName}\${categoryName}\add_winner`, {
+        fetch(`\\api\\${tournamentName}\\${categoryName}\\create_fixture`, {
             method: 'GET',
         }).then(response => {
             if (!response.ok) {

@@ -31,7 +31,7 @@ class Tournament(models.Model):
     game = models.ForeignKey('Game', on_delete=models.SET_NULL, related_name='tournament_game', blank= True, null= True)
     categories = models.ManyToManyField('Category', related_name='tournament_catagory', blank= True)
     venue = models.CharField('Venue', max_length=254, default="TBA")
-    
+    onGoing_matches = models.ManyToManyField('Match', related_name='tournament_on_going_matches', blank= True)
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(" ", "_")
         if self.pk:
@@ -47,7 +47,6 @@ class Tournament(models.Model):
     
 class Game(models.Model):
     game_type = models.CharField('game type', max_length=254)
-    default_categories = models.ManyToManyField('Category', related_name='game_catagory', blank= True)
     
     def __str__(self) -> str:
         return f"{self.game_type}"
@@ -61,10 +60,7 @@ class Category(models.Model):
     teams = models.ManyToManyField('Team', related_name='category_team', blank= True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     fixture = models.ForeignKey('Fixtures', on_delete=models.SET_NULL, related_name="this_fixture", blank= True, null= True)
-    # add more fields later
-        # date specific for tournament
-        # fixture_type [ knockout, league, round-robin, etc.]
-        
+    winner = models.ForeignKey('Team', on_delete=models.SET_NULL, related_name='category_winner', blank= True, null= True)
     def __str__(self) -> str:
         return f"{self.tournament} -> {self.catagory_type}"
 
@@ -90,11 +86,19 @@ class Match(models.Model):
     loser = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='loser', blank=True, null=True)
     match_state = models.BooleanField(default=False)
     sets = models.IntegerField(default=1)
-    # sets_scores = TODO later
-    
+    sets_scores = models.ManyToManyField('Scoreboard', related_name='match_scoreboard', blank= True)
+    court = models.ForeignKey('Court', on_delete=models.SET_NULL, related_name='match_court', blank= True, null= True)
     def __str__(self) -> str:
         return f"{self.team1} vs {self.team2}"
     
+class Scoreboard(models.Model):
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    team1_score = models.IntegerField(default=0)
+    team2_score = models.IntegerField(default=0)
+    set_no = models.IntegerField(default=1)
+    def __str__(self) -> str:
+        return f"{self.match} -> {self.team1_score} - {self.team2_score}"
+
 class Fixtures(models.Model):
     status = models.BooleanField(default=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="fixtures_category")
@@ -105,3 +109,10 @@ class Fixtures(models.Model):
     currentWinners = models.ManyToManyField(Team, related_name='current_winners', blank= True)
     def __str__(self) -> str:
         return f"{self.category} {self.id}"
+    
+class Court(models.Model):
+    name = models.CharField('court name', max_length=254)
+    current_match = models.ForeignKey(Match, on_delete=models.SET_NULL, related_name='current_match', blank= True, null= True)
+    tournamet = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    def __str__(self) -> str:
+        return f"{self.name}"
