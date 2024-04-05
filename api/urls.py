@@ -8,4 +8,5 @@ urlpatterns = [
     path('<str:tournament_name>/<str:category_name>/view_fixture/', view_fixture, name="view_fixture"),
     path('<str:tournament_name>/<str:category_name>/create_fixture/', create_fixture, name="create_fixture"),
     path('<str:tournament_name>/<str:category_name>/add_winner/', update_winner, name="add_winner"),
+    path('<str:tournament_name>/<str:category_name>/schedule_match/', schedule_match, name="schedule_match"),
 ]
