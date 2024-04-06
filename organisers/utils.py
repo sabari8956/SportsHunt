@@ -76,6 +76,7 @@ class knockoutFixtureGenerator:
 
         if len(winners) == 1:
             fixture_instance.currentStage -= 1
+            fixture_instance.category.winner = Team.objects.get(id=winners[0])
             fixture_instance.save()
             print("winner is", winners)
             return winners
