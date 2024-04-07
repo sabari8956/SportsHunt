@@ -151,6 +151,7 @@ def category_view(req, tournament_name, category_name):
     category_instance = tournament_instance.categories.get(catagory_type=category_name)
     fixture_instance = category_instance.fixture
     fixture_serializer = fixtureSerializer(fixture_instance)
+    tournament_data = TournamentSerializer(tournament_instance, many=False).data
     teams = [[mem.name for mem in team.members.all()] for team in category_instance.teams.all()] 
     fixture_data = FixtureSerializer(fixture_instance, many=False).data
     fixture_brackets = []
@@ -172,8 +173,15 @@ def category_view(req, tournament_name, category_name):
         4: 'Round of 16',
         5: 'Round of 32',
     }
-    print(stages_dict[fixture_data["currentStage"]], fixture_data["currentStage"])
     
+    ongoing_matches = []
+    
+    for match in tournament_data["onGoing_matches"]:
+        if match["match_category"]["id"] == category_instance.id:
+            ongoing_matches.append(match) 
+            
+    for matches in ongoing_matches:
+        print(f"{matches["team1"]["id"]} vs {matches["team2"]["id"]}")
     winner = None
     if fixture_data.get("currentWinners"):
         winner = fixture_data["currentWinners"]
@@ -188,9 +196,9 @@ def category_view(req, tournament_name, category_name):
         "fixture_serializer": fixture_serializer.data,
         "teams": teams,
         "fixture_brackets": fixture_brackets,
-        "stage": stages_dict[fixture_data["currentStage"]],
+        "stage": stages_dict.get(fixture_data["currentStage"], "Not Started"),
         "winner": winner,
-        "ongoing_matches": None,
+        "ongoing_matches": ongoing_matches,
         "upcoming_matches": fixture_data.get("currentBracket"),
     }
     

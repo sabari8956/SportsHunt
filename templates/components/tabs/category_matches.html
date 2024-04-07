@@ -9,7 +9,7 @@
     <h2 class="mb-3 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">UpComing Matches</h2>
 
     {% for match in upcoming_matches %}
-        {% include "components\tabs\category_matches_card.html" with match_data=match %}
+        {% include "components\tabs\category_matches_card.html" with match_data=match UpComing_match='true' %}
     {% endfor %}
 
 </div>
@@ -17,5 +17,28 @@
     function scheduleMatch(match_id) {
         var courtId = document.getElementById('court').value;
         console.log(match_id, courtId);
+        fetch("{% url 'api:schedule_match' tournament_name=tournament_data.name category_name=category_data.catagory_type %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                match_id: match_id,
+                court_id: ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            console.log(data.ok);
+            if (data.message == 'Match Scheduled Successfully') {
+                alert('Match Scheduled Successfully');
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 </script>
