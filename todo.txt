@@ -1,9 +1,7 @@
-TODO
-    - format all the stages and matches in json format and save it
-    - create a seprate page for category
-    - add all the features in the page 
-        - players, match stage, winner [ if over ]
-        - create fixture
-        - show scheduled match
-        - view fixture [graph]
-    
+upComing -> OnGoing matches ✅
+Scoreboard
+    -> whole tournament's matches.
+    -> particular Category
+
+    -> scoring page 
+        -> +1, -1, reset, declare winner.
