@@ -125,6 +125,7 @@ def view_fixture(req, tournament_name, category_name):
 @api_view(["GET","POST"])
 def schedule_match(req, tournament_name, category_name):
     match_id = req.data.get('match_id', None)
+    court_id = req.data.get('court_id', None)
     if not match_id:
         return Response({"error": "Match ID is required"}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -136,26 +137,26 @@ def schedule_match(req, tournament_name, category_name):
     fixture_instance = category_instance.fixture
     if not fixture_instance:
         return Response({"error": "Fixture not found"}, status=status.HTTP_404_NOT_FOUND)
-    serializers = fixtureSerializer(fixture_instance)
+    # serializers = fixtureSerializer(fixture_instance)
     
     # if len(serializers.data['currentBracket']) == 0 and len(tournament_instance.onGoing_matches.filter(match_category=category_instance)) == 0 and len(serializers.data['currentWinners']) == 1:
     #     return Response({"message": "Fixture completed", "winner": serializers.data['currentWinners'][0]}, status=status.HTTP_200_OK)
 
-    print([ match.id for match in fixture_instance.currentBracket.all()])
     category_matches = [ match.id for match in fixture_instance.currentBracket.all()]
     if not (Match.objects.filter(id=match_id).exists()):
         return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
     match_instance = Match.objects.get(id=match_id)
-    print(match_instance.match_category.id, category_instance.id)
     if not (match_instance.match_category.id == category_instance.id):
         return Response({"error": "match ID and category id doesnt match"}, status=status.HTTP_400_BAD_REQUEST)
     if not match_instance.id in category_matches:
         return Response({"error": "Match not found in the fixture"}, status=status.HTTP_400_BAD_REQUEST)
 
+    if court_id:
+        match_instance.court = court_id
+        match_instance.save()
+    
     fixture_instance.currentBracket.remove(match_instance)
     tournament_instance.onGoing_matches.add(match_instance)
     tournament_instance.save()
 
-    print("uhh")
-    print(fixture_instance, tournament_instance.onGoing_matches.all())
     return Response({"message":"match Scheduled"}, status=status.HTTP_200_OK)
