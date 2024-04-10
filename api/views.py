@@ -160,3 +160,117 @@ def schedule_match(req, tournament_name, category_name):
     tournament_instance.save()
 
     return Response({"message":"match Scheduled"}, status=status.HTTP_200_OK)
+
+@api_view(["GET", "POST"])  
+# @host_required
+def increment_score(req, match_id, team_id):
+    
+    if not (Match.objects.filter(id=match_id).exists() and Team.objects.filter(id=team_id).exists()):
+        return Response({"error": "Invalid match or team ID"}, status=status.HTTP_400_BAD_REQUEST)
+    match_instance = Match.objects.get(id=match_id)
+    
+    if not (team_id == match_instance.team1.id or team_id == match_instance.team2.id):
+        return Response({"error": "Team not found in the match"}, status=status.HTTP_400_BAD_REQUEST)
+    if team_id == match_instance.team1.id:
+        score_team1 = match_instance.current_set.team1_score
+        match_instance.current_set.team1_score = ( score_team1 + 1)
+    
+    elif team_id == match_instance.team2.id:
+        score_team2 = match_instance.current_set.team2_score
+        match_instance.current_set.team2_score = (score_team2 + 1)
+
+    else:
+        return Response({"error": "Team not found in the match"}, status=status.HTTP_400_BAD_REQUEST)
+    match_instance.current_set.save()
+    return Response({"message": "Score updated", "score":{
+        "team1": match_instance.current_set.team1_score,
+        "team2": match_instance.current_set.team2_score,
+        }}, status=status.HTTP_200_OK)
+
+@api_view(["GET", "POST"])
+# @host_required
+def decrement_score(req, match_id, team_id):
+
+    if not (Match.objects.filter(id=match_id).exists() and Team.objects.filter(id=team_id).exists()):
+        return Response({"error": "Invalid match or team ID"}, status=status.HTTP_400_BAD_REQUEST)
+    match_instance = Match.objects.get(id=match_id)
+    if not (team_id == match_instance.team1.id or team_id == match_instance.team2.id):
+        return Response({"error": "Team not found in the match"}, status=status.HTTP_400_BAD_REQUEST)
+    if team_id == match_instance.team1.id:
+        match_instance.current_set.team1_score -= 1
+    
+    elif team_id == match_instance.team2.id:
+        match_instance.current_set.team2_score -= 1
+    match_instance.current_set.save()
+    return Response({"message": "Score updated"}, status=status.HTTP_200_OK)
+
+@api_view(["GET", "POST"])
+def declare_match_winner(req, match_id, tournament_id):
+    
+    if not req.user.is_authenticated:
+        return Response({"error": "Login required"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    if not Match.objects.filter(id=match_id).exists():
+        return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if Match.objects.get(id=match_id).match_state:
+        return Response({"error": "Match completed"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not Tournament.objects.filter(id=tournament_id).exists():
+        return Response({"error": "Invalid tournament ID"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # if not (req.user in Tournament.objects.get(id=tournament_id).mods or req.user == Tournament.objects.get(id=tournament_id).org.admin):
+    #     return Response({"error": "Permission denied"}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    match_instance = Match.objects.get(id=match_id)
+
+    no_sets = match_instance.sets
+    sets_compeleted = [_set.winner.id for _set in match_instance.sets_scores.all() if _set.set_status]
+    if no_sets == len(sets_compeleted):
+        team1_wins = sets_compeleted.count(match_instance.team1.id)
+        team2_wins = sets_compeleted.count(match_instance.team2.id)
+        if team1_wins > team2_wins:
+            match_instance.winner = match_instance.team1
+            match_instance.loser = match_instance.team2
+            match_instance.match_state = True
+            match_instance.save()
+            return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
+        elif team2_wins > team1_wins:
+            match_instance.winner = match_instance.team2
+            match_instance.loser = match_instance.team1
+            match_instance.match_state = True
+            match_instance.save()
+            return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Match cant be draw or have even sets"}, status=status.HTTP_403_FORBIDDEN)
+        
+
+    
+    teamA_score = match_instance.current_set.team1_score
+    teamB_score = match_instance.current_set.team2_score
+    if teamA_score > teamB_score:
+        match_instance.current_set.winner = match_instance.team1
+        match_instance.current_set.set_status = True
+        print("winner", match_instance.current_set.winner)
+        set_id = match_instance.current_set.id
+        sets = [match.id for match in match_instance.sets_scores.all()]
+        match_instance.current_set = Scoreboard.objects.get(id=sets[sets.index(set_id)+1])
+        match_instance.current_set.save()
+        
+        return Response({"message": "Set completed"}, status=status.HTTP_200_OK)
+    
+    elif teamB_score > teamA_score:
+        match_instance.current_set.winner = match_instance.team2
+        match_instance.current_set.set_status = True
+        set_id = match_instance.current_set.id
+        sets = [match.id for match in match_instance.sets_scores.all()]
+        match_instance.current_set = Scoreboard.objects.get(id=sets[sets.index(set_id)+1])
+        match_instance.current_set.save()
+
+        print("winner", match_instance.current_set.winner)
+
+        return Response({"message": "Set completed"}, status=status.HTTP_200_OK)
+    
+    else:
+        return Response({"message": "Set cant be draw"}, status=status.HTTP_403_FORBIDDEN)
+    

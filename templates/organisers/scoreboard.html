@@ -1,0 +1,81 @@
+{% extends "organisers/base.html" %}
+
+{% block title %}
+Scoring
+{% endblock title %}
+
+
+{% block body %}
+{{tournament_data.name}}
+{{match_data.match_category.catagory_type}}
+
+{% if match_data.match_state %}
+  match got over
+{% else %}
+  {{match_data.match_state}}
+<div class="flex justify-center my-8">
+    <div class="bg-white shadow-md rounded-lg w-full max-w-md px-4 py-6">
+      <div class="flex justify-between">
+        <div class="flex items-center">
+          <div id="team-{{ match_data.team1.id }}" class="font-bold text-lg">{{ match_data.team1.members }}</div>
+          <div id="team-{{ match_data.team1.id }}-score" class="bg-gray-200 rounded-full px-3 py-1 ml-4 text-sm font-medium">{{ match_data.current_set.team1_score }}</div>
+        </div>
+        <div class="flex space-x-2">
+          <button data-url="{% url 'api:increment_score' match_data.id match_data.team1.id %}" onclick="increment_score('{{ match_data.team1.id }}', this.dataset.url)" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">+</button>
+          <button data-url="{% url 'api:decrement_score' match_data.id match_data.team1.id %}" onclick="decrement_score('{{ match_data.team1.id }}', this.dataset.url)" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full">-</button>
+        </div>
+      </div>
+      <div class="flex justify-between mt-6">
+        <div class="flex items-center">
+          <div id="team-{{ match_data.team2.id }}" class="font-bold text-lg">{{ match_data.team2.members }}</div>
+          <div id="team-{{ match_data.team2.id }}-score" class="bg-gray-200 rounded-full px-3 py-1 ml-4 text-sm font-medium">{{ match_data.current_set.team2_score }}</div>
+        </div>
+        <div class="flex space-x-2">
+          <button data-url="{% url 'api:increment_score' match_data.id match_data.team2.id %}" onclick="increment_score('{{ match_data.team2.id }}', this.dataset.url)" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">+</button>
+          <button data-url="{% url 'api:decrement_score' match_data.id match_data.team2.id %}" onclick="decrement_score('{{ match_data.team2.id }}', this.dataset.url)" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full">-</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function increment_score(team_id, url) {
+        console.log(team_id);
+        // make a post request to increment the score and update the score on the page
+
+        var score = document.getElementById(`team-${team_id}-score`);
+        var current_score = parseInt(score.innerHTML);
+        score.innerHTML = current_score + 1;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'team_id': team_id
+            })
+        })
+        
+    }
+    function decrement_score(team_id, url) {
+        console.log(team_id);
+        var score = document.getElementById(`team-${team_id}-score`);
+        var current_score = parseInt(score.innerHTML);
+        score.innerHTML = current_score - 1;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'team_id': team_id
+            })
+        })
+    }
+</script>
+
+{% endif %}
+{% endblock body %}

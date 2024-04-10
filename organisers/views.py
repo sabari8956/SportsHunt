@@ -203,3 +203,58 @@ def category_view(req, tournament_name, category_name):
     }
     
     return render(req, "organisers/category.html", data)
+
+@host_required
+def score_ongoingMatches(req, tournament_name):
+    
+    if not (Tournament.objects.filter(name=tournament_name).exists()):
+        return render(req, "errors/tournament_not_found.html", {
+            "tournament_name": tournament_name, 
+        })
+    
+    tournament_instance = Tournament.objects.get(name=tournament_name)
+    tournamentSerializer = TournamentSerializer(tournament_instance, many=False).data
+    
+    ongoing_matches = tournamentSerializer["onGoing_matches"]
+    
+    return render(req, "organisers/scoreboard_ongoing_matches.html", {
+        "ongoing_matches": ongoing_matches,
+    })
+    
+@host_required
+def scoreboard_view(req, tournament_name, match_id):
+    
+    if not (Tournament.objects.filter(name=tournament_name).exists()):
+        return render(req, "errors/tournament_not_found.html", {
+            "tournament_name": tournament_name, 
+        })
+    
+    if not (Match.objects.filter(id=match_id).exists()):
+        return render(req, "errors/tournament_not_found.html", { # Change this to match not found
+            "match_id": match_id, 
+        })
+    
+    tournament_instance = Tournament.objects.get(name=tournament_name)
+    tournament_serializer = TournamentSerializer(tournament_instance, many=False).data
+    match_instance = Match.objects.get(id= match_id)
+    match_serializer = MatchDataSerializer(match_instance).data
+    if match_serializer["id"] not in [ match["id"] for match in tournament_serializer["onGoing_matches"] ]:
+        return render(req, "errors/tournament_not_found.html", { # Change this to match not found
+            "match_id": match_id,
+            "tournament_name": "error match nt found" 
+        })
+        
+    if not match_serializer["sets_scores"]:
+        for i in range(match_serializer["sets"]):
+            match_instance.sets_scores.create(set_no= i+1, match= match_instance)
+            if i == 0:
+                match_instance.current_set = match_instance.sets_scores.get(set_no= 1)
+        match_instance.save()
+    
+    # print(tournament_serializer)
+    print(match_serializer)
+    
+    return render(req, "organisers/scoreboard.html", {
+        "tournament_data": tournament_instance,
+        "match_data": match_serializer,
+    })

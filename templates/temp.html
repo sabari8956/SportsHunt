@@ -1,40 +1,83 @@
-<div>
-  <label for="id_category">Category:</label>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scoreboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
 
-  <select name="category" data-price="your_price_value" id="id_category">
-    <option value="0">U18</option>
+    h1 {
+      margin-bottom: 30px;
+    }
 
-    <option value="1">U18W</option>
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
 
-  </select>
+    .scoreboard div {
+      margin: 0 20px;
+    }
 
-</div>
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Team A vs Team B</h1>
+  <div class="scoreboard">
+    <div>Team A: <span id="teamA-score">0</span></div>
+    <div>Team B: <span id="teamB-score">0</span></div>
+  </div>
+  <div>
+    <button onclick="incrementScore('teamA')">+1 Team A</button>
+    <button onclick="decrementScore('teamA')">-1 Team A</button>
+    <button onclick="incrementScore('teamB')">+1 Team B</button>
+    <button onclick="decrementScore('teamB')">-1 Team B</button>
+    <button onclick="resetScores()">Reset</button>
+  </div>
 
-<div>
-  <label for="id_price">Price:</label>
+  <script>
+    let teamAScore = 0;
+    let teamBScore = 0;
 
+    function incrementScore(team) {
+      if (team === 'teamA') {
+        teamAScore++;
+        document.getElementById('teamA-score').textContent = teamAScore;
+      } else {
+        teamBScore++;
+        document.getElementById('teamB-score').textContent = teamBScore;
+      }
+    }
 
+    function decrementScore(team) {
+      if (team === 'teamA' && teamAScore > 0) {
+        teamAScore--;
+        document.getElementById('teamA-score').textContent = teamAScore;
+      } else if (teamBScore > 0) {
+        teamBScore--;
+        document.getElementById('teamB-score').textContent = teamBScore;
+      }
+    }
 
-  <input type="number" name="price" required id="id_price">
-
-</div>
-
-<div>
-  <label for="id_name_1">Name 1:</label>
-
-
-
-  <input type="text" name="name_1" maxlength="100" required id="id_name_1">
-
-</div>
-
-<div>
-  <label for="id_name_2">Name 2:</label>
-
-
-
-  <input type="text" name="name_2" maxlength="100" required id="id_name_2">
-
-
-
-</div>
+    function resetScores() {
+      teamAScore = 0;
+      teamBScore = 0;
+      document.getElementById('teamA-score').textContent = teamAScore;
+      document.getElementById('teamB-score').textContent = teamBScore;
+    }
+  </script>
+</body>
+</html>

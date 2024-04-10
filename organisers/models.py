@@ -87,6 +87,7 @@ class Match(models.Model):
     match_state = models.BooleanField(default=False)
     sets = models.IntegerField(default=1)
     sets_scores = models.ManyToManyField('Scoreboard', related_name='match_scoreboard', blank= True)
+    current_set = models.ForeignKey('Scoreboard', on_delete=models.SET_NULL, related_name='current_set', blank= True, null= True)
     court = models.ForeignKey('Court', on_delete=models.SET_NULL, related_name='match_court', blank= True, null= True)
     def __str__(self) -> str:
         return f"{self.team1} vs {self.team2}"
@@ -96,6 +97,9 @@ class Scoreboard(models.Model):
     team1_score = models.IntegerField(default=0)
     team2_score = models.IntegerField(default=0)
     set_no = models.IntegerField(default=1)
+    winner = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='scoreboard_winner', blank=True, null=True)
+    set_status = models.BooleanField(default=False)
+    
     def __str__(self) -> str:
         return f"{self.match} -> {self.team1_score} - {self.team2_score}"
 

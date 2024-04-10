@@ -1,0 +1,40 @@
+{% extends "organisers/base.html" %}
+
+{% block title %}
+    OnGoing Matches 
+{% endblock title %}
+
+
+{% block body %}
+    {% for match in ongoing_matches %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div>
+              <h3 class="text-lg font-bold">
+                {% for player in match.team1.members %}
+                    {{player.name}}
+                {% endfor %}
+              </h3>
+            </div>
+          </div>
+          <div>
+            <p class="text-2xl font-bold">vs</p>
+          </div>
+          <div class="flex items-center">
+            <div>
+              <h3 class="text-lg font-bold">
+                {% for player in match.team2.members %}
+                    {{player.name}}
+                {% endfor %}
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-gray-500">{{ match.match_category.catagory_type }}</p>
+        </div>
+      </div>
+      <br>
+    {% endfor %}
+{% endblock body %}

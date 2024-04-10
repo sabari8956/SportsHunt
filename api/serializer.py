@@ -39,7 +39,18 @@ class TournamentSerializer(serializers.ModelSerializer):
         model = Tournament
         fields = '__all__'
         depth = 3
-        
+
+# NEED TO REWRITE ALL THE SERIALIZERS
+# IMP AS HELL, REGULATE ALL DATA.
+# class Tournament_Serializer(serializers.ModelSerializer):
+#     start_date = FormattedDateField(read_only=True)
+#     end_date = FormattedDateField(read_only=True, date_format='%d %b %y')
+#     org_name = serializers.CharField(source='org.name', read_only=True)
+#     game_type = serializers.CharField(source='game.game_type', read_only=True)
+#     onGoing_matches = 
+#     class Meta:
+#         model = Tournament
+#         fields = ['id', 'name', 'start_date', 'end_date', 'venue', 'org_name', 'game_type', 'onGoing_matches']
 class cartSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -104,3 +115,50 @@ class FixtureSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return dict(data)
+    
+
+class MatchDataSerializer(serializers.ModelSerializer):
+    class TeamSerializer(serializers.ModelSerializer):
+        members = PlayerSerializer(many=True, read_only=True)
+
+        class Meta:
+            model = Team
+            fields = ['id', 'members']
+
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            players = ', '.join(player['name'] for player in data['members'])
+            data['members'] = players
+            return dict(data)
+
+    class ScoreboardSerializer(serializers.ModelSerializer):
+        winner = TeamSerializer(read_only=True)
+
+        class Meta:
+            model = Scoreboard
+            fields = ['team1_score', 'team2_score', 'set_no', 'winner', 'set_status']
+            depth = 1
+
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            return dict(data)
+
+    class CategorySerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Category
+            fields = ['id', 'catagory_type']
+
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            return dict(data)
+    
+    team1 = TeamSerializer(read_only=True)
+    team2 = TeamSerializer(read_only=True)
+    sets_scores = ScoreboardSerializer(many=True, read_only=True)
+    current_set = ScoreboardSerializer(read_only=True)
+    match_category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Match
+        fields = ['id', 'match_no','match_state' ,'team1', 'team2', 'sets', 'sets_scores', 'court', 'current_set', 'match_category']
+        depth = 1
