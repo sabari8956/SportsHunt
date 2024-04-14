@@ -204,73 +204,79 @@ def decrement_score(req, match_id, team_id):
     match_instance.current_set.save()
     return Response({"message": "Score updated"}, status=status.HTTP_200_OK)
 
-@api_view(["GET", "POST"])
-def declare_match_winner(req, match_id, tournament_id):
-    
+@api_view(["POST"])
+def declare_match_winner(req):
     if not req.user.is_authenticated:
         return Response({"error": "Login required"}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    if not Match.objects.filter(id=match_id).exists():
-        return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    if Match.objects.get(id=match_id).match_state:
-        return Response({"error": "Match completed"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    if not Tournament.objects.filter(id=tournament_id).exists():
-        return Response({"error": "Invalid tournament ID"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # if not (req.user in Tournament.objects.get(id=tournament_id).mods or req.user == Tournament.objects.get(id=tournament_id).org.admin):
-    #     return Response({"error": "Permission denied"}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    match_instance = Match.objects.get(id=match_id)
 
-    no_sets = match_instance.sets
-    sets_compeleted = [_set.winner.id for _set in match_instance.sets_scores.all() if _set.set_status]
-    if no_sets == len(sets_compeleted):
-        team1_wins = sets_compeleted.count(match_instance.team1.id)
-        team2_wins = sets_compeleted.count(match_instance.team2.id)
+    #validate user and tournament
+    match_id = req.data.get('match_id', None)
+    tournament_id = req.data.get('tournament_id', None)
+    if not (match_id and tournament_id):
+        return Response({"error": "Match ID and tournament ID are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        match_instance = Match.objects.get(id=match_id)
+    except Match.DoesNotExist:
+        return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if match_instance.match_state:
+        return Response({"error": "Match completed"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        tournament_instance = Tournament.objects.get(id=tournament_id)
+    except Tournament.DoesNotExist:
+        return Response({"error": "Invalid tournament ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if match_instance not in tournament_instance.onGoing_matches.all():
+        return Response({"error": "Match not found in the tournament"}, status=status.HTTP_400_BAD_REQUEST)
+
+    fixture_instance = match_instance.match_category.fixture
+    if not fixture_instance:
+        return Response({"error": "Fixture not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+    completed_sets = match_instance.sets_scores.filter(set_status=True)
+    if len(completed_sets) == match_instance.sets:
+        team1_wins = completed_sets.filter(winner=match_instance.team1).count()
+        team2_wins = completed_sets.filter(winner=match_instance.team2).count()
+
         if team1_wins > team2_wins:
             match_instance.winner = match_instance.team1
             match_instance.loser = match_instance.team2
-            match_instance.match_state = True
-            match_instance.save()
-            return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
         elif team2_wins > team1_wins:
             match_instance.winner = match_instance.team2
             match_instance.loser = match_instance.team1
-            match_instance.match_state = True
-            match_instance.save()
-            return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "Match cant be draw or have even sets"}, status=status.HTTP_403_FORBIDDEN)
-        
+            return Response({"message": "Match can't be a draw or have even sets"}, status=status.HTTP_403_FORBIDDEN)
 
-    
-    teamA_score = match_instance.current_set.team1_score
-    teamB_score = match_instance.current_set.team2_score
-    if teamA_score > teamB_score:
-        match_instance.current_set.winner = match_instance.team1
-        match_instance.current_set.set_status = True
-        print("winner", match_instance.current_set.winner)
-        set_id = match_instance.current_set.id
-        sets = [match.id for match in match_instance.sets_scores.all()]
-        match_instance.current_set = Scoreboard.objects.get(id=sets[sets.index(set_id)+1])
-        match_instance.current_set.save()
-        
-        return Response({"message": "Set completed"}, status=status.HTTP_200_OK)
-    
-    elif teamB_score > teamA_score:
-        match_instance.current_set.winner = match_instance.team2
-        match_instance.current_set.set_status = True
-        set_id = match_instance.current_set.id
-        sets = [match.id for match in match_instance.sets_scores.all()]
-        match_instance.current_set = Scoreboard.objects.get(id=sets[sets.index(set_id)+1])
-        match_instance.current_set.save()
+        match_instance.match_state = True
+        match_instance.save()
+        knockoutFixtureGenerator().add_winners(fixture_instance.id, match_instance.winner.id)
+        return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
 
-        print("winner", match_instance.current_set.winner)
+    current_set = match_instance.current_set
+    team1_score = current_set.team1_score
+    team2_score = current_set.team2_score
 
-        return Response({"message": "Set completed"}, status=status.HTTP_200_OK)
-    
+    if team1_score > team2_score:
+        current_set.winner = match_instance.team1
+    elif team2_score > team1_score:
+        current_set.winner = match_instance.team2
     else:
-        return Response({"message": "Set cant be draw"}, status=status.HTTP_403_FORBIDDEN)
-    
+        return Response({"message": "Set can't be a draw"}, status=status.HTTP_403_FORBIDDEN)
+
+    current_set.set_status = True
+    current_set.save()
+
+    set_ids = [s.id for s in match_instance.sets_scores.all()]
+    current_set_index = set_ids.index(current_set.id)
+    if current_set_index < len(set_ids) - 1:
+        match_instance.current_set = Scoreboard.objects.get(id=set_ids[current_set_index + 1])
+        match_instance.current_set.save()
+    else:
+        match_instance.match_state = True
+        match_instance.save()
+        knockoutFixtureGenerator().add_winners(fixture_instance.id, current_set.winner.id)
+        return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
+
+    return Response({"message": "Set completed"}, status=status.HTTP_200_OK)

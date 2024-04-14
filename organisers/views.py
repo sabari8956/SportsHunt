@@ -219,6 +219,7 @@ def score_ongoingMatches(req, tournament_name):
     
     return render(req, "organisers/scoreboard_ongoing_matches.html", {
         "ongoing_matches": ongoing_matches,
+        "tournament_name": tournament_instance.name,
     })
     
 @host_required

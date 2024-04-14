@@ -74,6 +74,7 @@ class knockoutFixtureGenerator:
         if fixture_instance.currentBracket.exists():
             raise Exception("All matches are not completed")
 
+        print("winners are", winners, fixture_instance.currentStage)
         if len(winners) == 1:
             fixture_instance.currentStage -= 1
             fixture_instance.category.winner = Team.objects.get(id=winners[0])
@@ -82,7 +83,7 @@ class knockoutFixtureGenerator:
             return winners
         
         random.shuffle(winners)
-
+        print("winners are", winners)
         fixture_instance.currentBracket.clear()
         fixture_instance.currentWinners.clear()
         nearest_power_of_2 = 2 ** math.ceil(math.log2(len(winners)))
@@ -102,8 +103,10 @@ class knockoutFixtureGenerator:
         return True
 
     def add_winners(self, fixture_id, winner):
-        print("still match has to be transfered to ongoing matches")
+        # print("still match has to be transfered to ongoing matches") its done
         fixture_instance = Fixtures.objects.get(id= fixture_id)
+        category_instance = fixture_instance.category
+        tournament_instance = category_instance.tournament
         # bracket = fixture_instance.currentBracket.all()
         tournament_instance = fixture_instance.category.tournament
         onGoingMatches = tournament_instance.onGoing_matches.all()
@@ -119,7 +122,9 @@ class knockoutFixtureGenerator:
         if not status:
             raise Exception("Winner not found in current bracket")
         
-        if not fixture_instance.currentBracket.exists():
+        thisfixture_onGoingMatches = [match for match in tournament_instance.onGoing_matches.all() if match.match_category == category_instance]
+        print('thisfixture_onGoingMatches', thisfixture_onGoingMatches)
+        if not thisfixture_onGoingMatches:
             print('going to next bracket')
             self.nextBracket(fixture_instance.id)
         return status
