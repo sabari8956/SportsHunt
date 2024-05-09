@@ -8,9 +8,16 @@ from .forms import *
 from .decorators import organiser_required, host_required
 # Create your views here.
 
+# things todo 
+
+# Increase code score
+    # Clean up the code
+# Serializers instead of forms
+# rewrite all the serializers for the specific needs
+
 @organiser_required
 def index(req):
-    
+    # we can move this inside @organiser_required decorator
     organisation = req.session.get("organisation", None)
     if not organisation:
         return redirect("organisers:orgs")
@@ -21,6 +28,7 @@ def index(req):
     if not (req.user.id == serializer.data["admin"] or  req.user.id in serializer.data["mods"]):
         req.session["organisation"] = None
         return redirect("organisers:orgs")
+    # till here
     
     tourns = Tournament.objects.filter(org= organisation)
     tournament_serializer = TournamentSerializer(tourns, many=True)
@@ -31,6 +39,7 @@ def index(req):
 
 @organiser_required
 def organisation_creation_form(req):
+    # Convert all these into serializers
     if req.method == "POST":
         form = OrganaisationForm(req.POST)
         if form.is_valid():
@@ -73,6 +82,7 @@ def organisation_page(req):
     
 @organiser_required
 def tournament_creation_form(req):
+    # Convert all these into serializers
     if req.method == "POST":
         form = TournamentForm(req.POST)
         if form.is_valid():
