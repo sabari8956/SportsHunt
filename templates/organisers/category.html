@@ -34,8 +34,8 @@
             <br />
             {{ category_data.team_size }} <br>
             {% if fixture_data.currentStage  ==  0 %}
-                {% for player in winner.members %}
-                  {{player.name}}
+                {% for player in fixture_data.currentWinners %}
+                  {{player.members}} 
                 {% endfor %}
             {% else %}
                 {{stage}}

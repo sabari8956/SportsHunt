@@ -13,7 +13,7 @@
             <div>
               <h3 class="text-lg font-bold">
                 {% for player in match.team1.members %}
-                    {{player.name}}
+                    {{player}}
                 {% endfor %}
               </h3>
             </div>
@@ -25,7 +25,7 @@
             <div>
               <h3 class="text-lg font-bold">
                 {% for player in match.team2.members %}
-                    {{player.name}}
+                    {{player}}
                 {% endfor %}
               </h3>
             </div>

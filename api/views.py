@@ -25,6 +25,7 @@ def OrganisationApi(req):
     serializers = OrganisationSerializer(data, many=True)
     # return Response(serializers.data)
     return redirect('core:index')
+
 @login_required
 @api_view(["POST"])
 def add_to_cart(req):
