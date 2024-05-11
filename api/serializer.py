@@ -250,7 +250,7 @@ class decoratorTournamentHostValidator(serializers.ModelSerializer):
         return dict(data)
     
     
-# just for now, core org view.
+# just for now, core org view, OrganisationApi api.
 class orgSerlializer(serializers.ModelSerializer):
     class Meta:
         model = Organisation

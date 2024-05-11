@@ -5,6 +5,8 @@ from .models import *
 from api.serializer import decoratorTournamentHostValidator, decoratorOrgSerializer
 
 def args_validater(view_func):
+    #  in future add a parameter to the decorator and redirect it there.
+    # like if its in a tournament, redirect to the same tournament page.
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         if 'tournament_name' in kwargs:
@@ -31,6 +33,13 @@ def args_validater(view_func):
                 return redirect("core:index")
             # in future add a 404 url page.
             
+        if 'team_id' in kwargs:
+            team_id = kwargs.get('team_id')
+            team = Team.objects.filter(id=team_id).first()
+            if not team:
+                messages.info(request, 'No Such Team Found!')
+                return redirect("core:index")
+            # in future add a 404 url page.
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
@@ -46,23 +55,7 @@ def organiser_required(view_func):
         if not request.user.is_organiser:
             messages.info(request, 'You Need to be an Organiser!')
             return redirect("core:index")
-        
-        if org := request.session.get('organisation'):
-            print(org)
-            org = Organisation.objects.filter(id=org).first()
-            serializer = decoratorOrgSerializer(org).data
-            print(serializer['admin'] == request.user.id)
-            if not serializer:
-                messages.info(request, 'No Organisation Found!')
-                return redirect("organisers:orgs") # check if the user has an organisation
-            
-            if (request.user.id != serializer['admin'] or request.user.id in serializer['mods']):
-                messages.info(request, 'wtf! You are not in this organisation!')
-                return redirect("organisers:orgs") # check if the user has an organisation or create one.
-            
-        else:
-            # when coming from organiser:orgs, it creates a inf loop, so i just removed the decorator.
-            return redirect("organisers:orgs") # check if the user has an organisation or create one.
+
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
@@ -88,5 +81,27 @@ def host_required(view_func):
         else:
             raise ValueError('No Tournament Name argument found in the view function')
         
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+def OrgHost_required(view_func):
+    @organiser_required
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if org := request.session.get('organisation'):
+            org = Organisation.objects.filter(id=org).first()
+            serializer = decoratorOrgSerializer(org).data
+            print(serializer['admin'] == request.user.id)
+            if not serializer:
+                messages.info(request, 'No Organisation Found!')
+                return redirect("organisers:orgs") # check if the user has an organisation
+            
+            if (request.user.id != serializer['admin'] or request.user.id in serializer['mods']):
+                messages.info(request, 'wtf! You are not in this organisation!')
+                return redirect("organisers:orgs") # check if the user has an organisation or create one.
+            
+        else:
+            # when coming from organiser:orgs, it creates a inf loop, so i just removed the decorator.
+            return redirect("organisers:orgs") # check if the user has an organisation or create one.
         return view_func(request, *args, **kwargs)
     return _wrapped_view

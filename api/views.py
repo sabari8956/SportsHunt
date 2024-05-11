@@ -6,15 +6,26 @@ from core.models import *
 from .serializer import *
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from organisers.utils import *
-from organisers.decorators import host_required
+# from django.contrib.auth.decorators import login_required
+# from organisers.decorators import host_required, OrgHost_required 
+# NEED TO CREATE API VERSION DECORATORS
 
 @api_view(["GET", "POST"])
 def OrganisationApi(req):
+    """_summary_
+    Creates a new organisation and saves it to the database
+    ig im not sure.
+    Args:
+        req (_type_): _description_
+
+    Returns:
+    Redirects
+        _type_: _description_
+    """
     if req.method == "POST":
         data = req.data
-        serializers = OrganisationSerializer(data= data)
+        serializers = orgSerlializer(data= data)
         if serializers.is_valid():
             serializers.save()
             return redirect('core:index')
@@ -22,11 +33,10 @@ def OrganisationApi(req):
         return redirect("organisers:new_organisation")
     
     data = Organisation.objects.all()
-    serializers = OrganisationSerializer(data, many=True)
-    # return Response(serializers.data)
+    serializers = orgSerlializer(data, many=True)
     return redirect('core:index')
 
-@login_required
+# @login_required
 @api_view(["POST"])
 def add_to_cart(req):
     data = req.data
@@ -53,7 +63,7 @@ def add_to_cart(req):
     messages.add_message(req, messages.SUCCESS, "added to cart successfully")
     return Response({"message": data}, status=status.HTTP_200_OK)
 
-@login_required
+# @login_required
 @api_view(["GET","POST"])
 def checkout(req):
     user_instance = User.objects.get(username= req.user)
@@ -63,6 +73,7 @@ def checkout(req):
     user_instance.cart.remove(*cart_data)
     return Response({"message": "Checkout was  successfully"}, status=status.HTTP_200_OK)
 
+# @OrgHost_required 
 # @host_required
 @api_view(["GET", "POST"])
 def create_fixture(req, tournament_name, category_name):
@@ -87,6 +98,7 @@ def create_fixture(req, tournament_name, category_name):
         },
        status=status.HTTP_200_OK)    
     
+# @OrgHost_required
 # @host_required
 @api_view(["POST"])
 def update_winner(req, tournament_name, category_name):
@@ -106,6 +118,7 @@ def update_winner(req, tournament_name, category_name):
     status_ = knockoutFixtureGenerator().add_winners(fixture_instance.id, winner_team_id)
     return Response({"message": status_}, status=status.HTTP_200_OK)
 
+# @OrgHost_required
 # @host_required
 @api_view(["GET"])
 def view_fixture(req, tournament_name, category_name):
@@ -117,11 +130,12 @@ def view_fixture(req, tournament_name, category_name):
     fixture_instance = category_instance.fixture
     if not fixture_instance:
         return Response({"error": "Fixture not found"}, status=status.HTTP_404_NOT_FOUND)
-    serializers = fixtureSerializer(fixture_instance)
+    serializers = FixtureSerializer(fixture_instance)
     if len(serializers.data['currentBracket']) == 0 and len(serializers.data['currentWinners']) == 1:
         return Response({"message": "Fixture completed", "winner":serializers.data['currentWinners'][0]}, status=status.HTTP_200_OK)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
+# @OrgHost_required
 # @host_required
 @api_view(["GET","POST"])
 def schedule_match(req, tournament_name, category_name):
@@ -162,8 +176,9 @@ def schedule_match(req, tournament_name, category_name):
 
     return Response({"message":"match Scheduled"}, status=status.HTTP_200_OK)
 
-@api_view(["GET", "POST"])  
+# @OrgHost_required
 # @host_required
+@api_view(["GET", "POST"])  
 def increment_score(req, match_id, team_id):
     
     if not (Match.objects.filter(id=match_id).exists() and Team.objects.filter(id=team_id).exists()):
@@ -188,8 +203,8 @@ def increment_score(req, match_id, team_id):
         "team2": match_instance.current_set.team2_score,
         }}, status=status.HTTP_200_OK)
 
-@api_view(["GET", "POST"])
 # @host_required
+@api_view(["GET", "POST"])
 def decrement_score(req, match_id, team_id):
 
     if not (Match.objects.filter(id=match_id).exists() and Team.objects.filter(id=team_id).exists()):
@@ -205,6 +220,8 @@ def decrement_score(req, match_id, team_id):
     match_instance.current_set.save()
     return Response({"message": "Score updated"}, status=status.HTTP_200_OK)
 
+# @OrgHost_required
+# @host_required
 @api_view(["POST"])
 def declare_match_winner(req):
     if not req.user.is_authenticated:
