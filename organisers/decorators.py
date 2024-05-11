@@ -48,10 +48,10 @@ def organiser_required(view_func):
             return redirect("core:index")
         
         if org := request.session.get('organisation'):
+            print(org)
             org = Organisation.objects.filter(id=org).first()
             serializer = decoratorOrgSerializer(org).data
             print(serializer['admin'] == request.user.id)
-            
             if not serializer:
                 messages.info(request, 'No Organisation Found!')
                 return redirect("organisers:orgs") # check if the user has an organisation
@@ -61,7 +61,7 @@ def organiser_required(view_func):
                 return redirect("organisers:orgs") # check if the user has an organisation or create one.
             
         else:
-            
+            # when coming from organiser:orgs, it creates a inf loop, so i just removed the decorator.
             return redirect("organisers:orgs") # check if the user has an organisation or create one.
         return view_func(request, *args, **kwargs)
     return _wrapped_view

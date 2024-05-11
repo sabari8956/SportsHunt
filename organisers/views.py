@@ -12,7 +12,6 @@ from .decorators import organiser_required, host_required
 def index(req):
     # we can move this inside @organiser_required decorator
     organisation = req.session.get("organisation", None)
-    print(organisation)
     orgs = Organisation.objects.get(id= organisation)
     serializer = BasicTournamentSerializer(orgs)
 

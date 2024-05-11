@@ -249,3 +249,13 @@ class decoratorTournamentHostValidator(serializers.ModelSerializer):
         data = super().to_representation(instance)
         return dict(data)
     
+    
+# just for now, core org view.
+class orgSerlializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organisation
+        fields = '__all__'
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return dict(data)

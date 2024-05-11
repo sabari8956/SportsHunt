@@ -11,6 +11,8 @@ from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from organisers.forms import *
 # Create your views here.
+
+
 def index(req):
     messages = req._messages
     now = timezone.now()
@@ -94,7 +96,7 @@ def organisation_view(req, org_name):
             "org_name": org_name,
         })
     org_data = Organisation.objects.get(name=org_name)
-    serializer = OrganisationSerializer(org_data, many=False)
+    serializer = orgSerlializer(org_data, many=False)
     print(serializer.data)
     return render(req, "core/organisation.html", {
         "org_data": serializer.data,
@@ -106,7 +108,7 @@ def organisation_tournament_view(req, tournament_name):
             "tournament_name": tournament_name, 
         })
     tournament = Tournament.objects.get(name=tournament_name)
-    serializer = TournamentSerializer(tournament, many=False)
+    serializer = BasicTournamentSerializer(tournament, many=False)
     return render(req, "core/tournament.html", {
         "tournament_data": serializer.data,
     })
