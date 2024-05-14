@@ -138,10 +138,20 @@ class FixtureSerializer(serializers.ModelSerializer):
 
 # Serializer for creating tournaments with categories
 class CreateCategoriesTournamentSerializer(serializers.ModelSerializer):
-    categories = CategorySerializer(many=True, read_only=True)
+    class CategoriesNameSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Category
+            fields = ['catagory_type']
+        
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            return data['catagory_type']
+        
+    categories = CategoriesNameSerializer(many=True, read_only=True)
     class Meta:
         model = Tournament
-        fields = ['id', 'name', 'categories']    
+        fields = ['categories']
+        
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return dict(data)

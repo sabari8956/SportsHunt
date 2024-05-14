@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from utils import *
@@ -12,20 +12,18 @@ from .decorators import organiser_required, host_required, OrgHost_required
 def index(req):
     # we can move this inside @organiser_required decorator
     organisation = req.session.get("organisation", None)
-    orgs = Organisation.objects.get(id= organisation)
-    serializer = BasicTournamentSerializer(orgs)
-
-    
-    tourns = Tournament.objects.filter(org= organisation)
+    org = Organisation.objects.get(id= organisation)
+    tourns = Tournament.objects.filter(org= org)
     tournament_serializer = BasicTournamentSerializer(tourns, many=True)
     return render(req, "organisers/organiser_index.html", {
-        "organisation": serializer.data,
+        "organisation": org.name,
         "tournaments": tournament_serializer.data
     })
 
 @organiser_required
 def organisation_creation_form(req):
     # Convert all these into serializers
+    # need to change to api soon
     if req.method == "POST":
         form = OrganaisationForm(req.POST)
         if form.is_valid():
@@ -43,9 +41,8 @@ def organisation_creation_form(req):
 
 @organiser_required
 def organisation_page(req): # org selection page
-    orgs = Organisation.objects.filter(admin= req.user)
-    orgs = [org.id for org in orgs]
-    
+    org = Organisation.objects.filter(admin= req.user)
+    orgs = [_org.id for _org in org]
     if req.method == "POST":
         opt = int(req.POST["option"])
         if opt in orgs:
@@ -62,36 +59,31 @@ def organisation_page(req): # org selection page
         return redirect("organisers:index")
 
     return render(req, "organisers/organisation_selection.html", {
-        "orgs": orgs,
+        "orgs": org,
     })
     
 @OrgHost_required
 # change this to API soon.
-def create_tournament(req, form):
+def tournament_creation_form(req):
+    # Convert all these into serializers
     if req.method == "POST":
+        form = TournamentForm(req.POST)
         if form.is_valid():
-            form.save(org=req.session["organisation"])
+            form.save(org= req.session["organisation"])
             return redirect("organisers:index")
 
         return render(req, "organisers/tournament_form.html", {
             "form": form 
-        })
-# i spilted this for now but we can merge this with the above function as a API soon.
-def tournament_creation_form(req):
-    # Convert all these into serializers
-    form = TournamentForm(req.POST) if req.method == "POST" else TournamentForm()
-    return create_tournament(req, form)
+            })
+
+    return render(req, "organisers/tournament_form.html",{
+        "form": TournamentForm(),
+    })
 
 @OrgHost_required
 @host_required
 def create_categories(req, tournament_name):
-    print("here")
     tournament = Tournament.objects.get(name=tournament_name)
-    if not tournament:
-        print("here")
-        messages.add_message(req, messages.ERROR, 'No Such Tournament Found.')
-        return redirect("organisers:index")
-
     serializer = CreateCategoriesTournamentSerializer(tournament).data
     cats = serializer["categories"]
     if req.POST:
@@ -113,33 +105,19 @@ def create_categories(req, tournament_name):
     return render(req, r"organisers\create_catogry_form.html",{
         "form": CategoriesForm(),
     })
+
 @OrgHost_required
 @host_required
 def org_tournament_view(req, tournament_name):
-    if not (Tournament.objects.filter(name=tournament_name).exists()):
-        return render(req, "errors/tournament_not_found.html", {
-            "tournament_name": tournament_name, 
-        })
     tournament = Tournament.objects.get(name=tournament_name)
     serializer = OrgTournamentSerializer(tournament, many=False)
-    print(serializer.data)
     return render(req, "organisers/org_tournament_view.html", {
         "tournament_data": serializer.data,
-        "n_categories": range(len(serializer.data["categories"])),
     })
 
 @OrgHost_required
 @host_required
 def category_view(req, tournament_name, category_name):
-    if not (Tournament.objects.filter(name=tournament_name).exists()):
-        return render(req, "errors/tournament_not_found.html", {
-            "tournament_name": tournament_name, 
-        })
-    
-    if not (Tournament.objects.get(name=tournament_name).categories.filter(catagory_type=category_name).exists()):
-        return render(req, "errors/category_not_found.html", {
-            "category_name": category_name, 
-        })
     
     stages_dict = {
         None: 'Not Started',
@@ -154,35 +132,31 @@ def category_view(req, tournament_name, category_name):
     tournament_instance = Tournament.objects.get(name=tournament_name)
     category_instance = tournament_instance.categories.get(catagory_type=category_name)
     serializers = CategoryViewSerializer(category_instance, many=False).data
+    print(serializers) 
+#{'catagory_type': 'U18BS', 'details': 'under 18 boys singles', 'price': 899, 'fixture': None, 'teams': []}
     teams = [team['members'] for team in serializers["teams"]]
     fixture_data = serializers["fixture"]
-    upcoming_matches = fixture_data["currentBracket"]
+    upcoming_matches, stage = None, 'Fixture not Created Yet!'
+    if fixture_data:
+        upcoming_matches = fixture_data.get("currentBracket")
+        stage = stages_dict.get(fixture_data["currentStage"], "Not Started -")
     
-    print(fixture_data)
     return render(req, "organisers/category.html", {
         "tournament_data": tournament_instance,
         "category_data": category_instance,
         "fixture_data": fixture_data,
         "teams": teams,
         "upcoming_matches": upcoming_matches,
-        "stage": stages_dict.get(fixture_data["currentStage"], "Not Started -")
-        
+        "stage": stage,
     })
     
 @OrgHost_required
 @host_required
 def score_ongoingMatches(req, tournament_name):
-    
-    if not (Tournament.objects.filter(name=tournament_name).exists()):
-        return render(req, "errors/tournament_not_found.html", {
-            "tournament_name": tournament_name, 
-        })
-    
     tournament_instance = Tournament.objects.get(name=tournament_name)
     tournamentSerializer = TournamentOngoingMatchesSerializer(tournament_instance, many=False).data
     
     ongoing_matches = tournamentSerializer["onGoing_matches"]
-    print(tournamentSerializer)
     return render(req, "organisers/scoreboard_ongoing_matches.html", {
         "ongoing_matches": ongoing_matches,
         "tournament_name": tournament_instance.name,
@@ -191,17 +165,6 @@ def score_ongoingMatches(req, tournament_name):
 @OrgHost_required 
 @host_required
 def scoreboard_view(req, tournament_name, match_id):
-    
-    if not (Tournament.objects.filter(name=tournament_name).exists()):
-        return render(req, "errors/tournament_not_found.html", {
-            "tournament_name": tournament_name, 
-        })
-    
-    if not (Match.objects.filter(id=match_id).exists()):
-        return render(req, "errors/tournament_not_found.html", { # Change this to match not found
-            "match_id": match_id, 
-        })
-    
     tournament_instance = Tournament.objects.get(name=tournament_name)
     tournament_serializer = TournamentOngoingMatchesSerializer(tournament_instance, many=False).data
     match_instance = Match.objects.get(id= match_id)

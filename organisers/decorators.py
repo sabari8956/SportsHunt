@@ -14,12 +14,13 @@ def args_validater(view_func):
             tournament = Tournament.objects.filter(name=tournament_name).first()
             if not tournament:
                 messages.info(request, 'No Such Tournament Found!')
-                return redirect("core:index")
-            # in future add a 404 url page.
-            
+                return render(request, "errors/tournament_not_found.html", {
+                    "tournament_name": tournament_name, 
+                    })
+              
         if 'category_name' in kwargs:
             category_name = kwargs.get('category_name')
-            category = Category.filter(catagory_type=category_name).first()
+            category = Category.objects.filter(catagory_type=category_name).first()
             if not category:
                 messages.info(request, 'No Such Category Found!')
                 return redirect("core:index")
@@ -32,7 +33,7 @@ def args_validater(view_func):
                 messages.info(request, 'No Such Match Found!')
                 return redirect("core:index")
             # in future add a 404 url page.
-            
+        
         if 'team_id' in kwargs:
             team_id = kwargs.get('team_id')
             team = Team.objects.filter(id=team_id).first()
@@ -40,6 +41,12 @@ def args_validater(view_func):
                 messages.info(request, 'No Such Team Found!')
                 return redirect("core:index")
             # in future add a 404 url page.
+        
+        if 'tournament_name' in kwargs and 'category_name' in kwargs:
+            if not Category.objects.filter(catagory_type=kwargs['category_name'], tournament__name=kwargs['tournament_name']).exists():
+                messages.info(request, 'No Such Category Found! in the Tournament')
+                return redirect("core:index")
+        
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
@@ -91,7 +98,6 @@ def OrgHost_required(view_func):
         if org := request.session.get('organisation'):
             org = Organisation.objects.filter(id=org).first()
             serializer = decoratorOrgSerializer(org).data
-            print(serializer['admin'] == request.user.id)
             if not serializer:
                 messages.info(request, 'No Organisation Found!')
                 return redirect("organisers:orgs") # check if the user has an organisation

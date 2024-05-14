@@ -7,6 +7,6 @@ urlpatterns = [
     path('logout/', logout_view, name="logout"),
     path('register/', register_view, name="register"),
     path('cart/', cart_view, name="cart"),
-    path('organisation/<str:org_name>', organisation_view, name="organisation"),
-    path('tournament/<str:tournament_name>', organisation_tournament_view, name='organisation_tournament'),
+    path('organisation/<str:org_name>/', organisation_view, name="organisation"),
+    path('tournament/<str:tournament_name>/', organisation_tournament_view, name='organisation_tournament'),
 ]

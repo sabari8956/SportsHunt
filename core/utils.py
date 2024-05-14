@@ -9,25 +9,17 @@ def validateRegister(req):
     confirmation = req.POST["confirmation"]
     if not username:
         messages.add_message(req, messages.ERROR, 'Enter a Valid Username')
-        return render(req, "auth/register.html", {
-            "message": "Enter a Valid Username"
-        })        
+        return False       
     if password != confirmation:
         messages.add_message(req, messages.ERROR, 'Passwords must match.')
-        return render(req, "auth/register.html", {
-            "message": "Passwords must match."
-        })
+        return False
     if User.objects.filter(username=username).exists():
         messages.add_message(req, messages.ERROR, 'Username already taken.')
-        return render(req, "auth/register.html", {
-            "message": "Username already taken."
-        })
+        return False
         
     elif User.objects.filter(email=email).exists():
         messages.add_message(req, messages.ERROR, 'Email already registed')
-        return render(req, "auth/register.html", {
-            "message": "Email already registed"
-        })
+        return False
         
     else:
         try:
@@ -36,7 +28,6 @@ def validateRegister(req):
                 user.is_organiser = True
             user.save()
         except Exception as e:
-            return render(req, "auth/register.html", {
-                "message": str(e)
-            })
+            messages.add_message(req, messages.ERROR, 'Error: ' + str(e))
+            return False
     return user

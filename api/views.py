@@ -16,6 +16,8 @@ def OrganisationApi(req):
     """_summary_
     Creates a new organisation and saves it to the database
     ig im not sure.
+    
+    This FN is not at all used.
     Args:
         req (_type_): _description_
 
@@ -24,6 +26,7 @@ def OrganisationApi(req):
         _type_: _description_
     """
     if req.method == "POST":
+        print('am i even being used?')
         data = req.data
         serializers = orgSerlializer(data= data)
         if serializers.is_valid():
@@ -103,7 +106,6 @@ def create_fixture(req, tournament_name, category_name):
 @api_view(["POST"])
 def update_winner(req, tournament_name, category_name):
     winner_team_id = int(req.data.get('winner_team_id'))
-    print(winner_team_id)
     if not winner_team_id:
         return Response({"error": "Winner team ID is required"}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -141,25 +143,17 @@ def view_fixture(req, tournament_name, category_name):
 def schedule_match(req, tournament_name, category_name):
     match_id = req.data.get('match_id', None)
     court_id = req.data.get('court_id', None)
-    if not match_id:
-        return Response({"error": "Match ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    if not (Tournament.objects.filter(name= tournament_name).exists() and category_name in Tournament.objects.get(name= tournament_name).categories.all().values_list('catagory_type', flat=True)):
-        return Response({"error": "Tournament or Category not found"}, status=status.HTTP_404_NOT_FOUND)
     
     tournament_instance = Tournament.objects.get(name= tournament_name)
     category_instance = tournament_instance.categories.get(catagory_type= category_name)
     fixture_instance = category_instance.fixture
     if not fixture_instance:
         return Response({"error": "Fixture not found"}, status=status.HTTP_404_NOT_FOUND)
-    # serializers = fixtureSerializer(fixture_instance)
-    
-    # if len(serializers.data['currentBracket']) == 0 and len(tournament_instance.onGoing_matches.filter(match_category=category_instance)) == 0 and len(serializers.data['currentWinners']) == 1:
-    #     return Response({"message": "Fixture completed", "winner": serializers.data['currentWinners'][0]}, status=status.HTTP_200_OK)
 
     category_matches = [ match.id for match in fixture_instance.currentBracket.all()]
     if not (Match.objects.filter(id=match_id).exists()):
         return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
+    
     match_instance = Match.objects.get(id=match_id)
     if not (match_instance.match_category.id == category_instance.id):
         return Response({"error": "match ID and category id doesnt match"}, status=status.HTTP_400_BAD_REQUEST)
@@ -224,8 +218,8 @@ def decrement_score(req, match_id, team_id):
 # @host_required
 @api_view(["POST"])
 def declare_match_winner(req):
-    if not req.user.is_authenticated:
-        return Response({"error": "Login required"}, status=status.HTTP_401_UNAUTHORIZED)
+    # if not req.user.is_authenticated:
+    #     return Response({"error": "Login required"}, status=status.HTTP_401_UNAUTHORIZED)
 
     #validate user and tournament
     match_id = req.data.get('match_id', None)

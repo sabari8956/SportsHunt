@@ -19,7 +19,7 @@ def index(req):
     now = timezone.now()
     end_date = now + timedelta(days=15)
     upcoming_tournaments = Tournament.objects.filter(start_date__range=(now, end_date)).order_by('start_date')[:5]
-    print(upcoming_tournaments)
+    # print(upcoming_tournaments)x
     return render(req, "core/index.html", {
         "messages":messages,
         "upcoming_tournaments": upcoming_tournaments,
@@ -37,9 +37,8 @@ def login_view(req):
                 return HttpResponseRedirect(reverse("organisers:index"))
             return HttpResponseRedirect(reverse("core:index"))
         else:
-            return render(req, "auth/login.html", {
-                "message": "Invalid Username/ Password",
-        })
+            messages.add_message(req, messages.ERROR, 'Invalid Username/ Password')
+            return render(req, "auth/login.html")
     return render(req, "auth/login.html", {})
 
 def logout_view(req):
@@ -49,10 +48,12 @@ def logout_view(req):
 def register_view(req):
     if req.method == "POST":
         user = validateRegister(req)
-        login(req, user)
-        if user.is_organiser:
-            return HttpResponseRedirect(reverse("organisers:index"))
-        return HttpResponseRedirect(reverse("core:index"))
+        if user:
+            login(req, user)
+            if user.is_organiser:
+                return HttpResponseRedirect(reverse("organisers:index"))
+            return HttpResponseRedirect(reverse("core:index"))
+        return render(req, "auth/register.html")
     else:
         return render(req, "auth/register.html")
 
@@ -63,7 +64,6 @@ def organisation_view(req, org_name):
         })
     org_data = Organisation.objects.get(name=org_name)
     serializer = orgSerlializer(org_data, many=False)
-    print(serializer.data)
     return render(req, "core/organisation.html", {
         "org_data": serializer.data,
     })
@@ -74,12 +74,12 @@ def organisation_tournament_view(req, tournament_name):
             "tournament_name": tournament_name, 
         })
     tournament = Tournament.objects.get(name=tournament_name)
-    serializer = BasicTournamentSerializer(tournament, many=False)
+    serializer = OrgTournamentSerializer(tournament, many=False)
     return render(req, "core/tournament.html", {
-        "tournament_data": serializer.data,
+        "tournament_data": serializer.data,  
     })
 
-@login_required
+@login_required(login_url="/login/") # maybe rewrite this
 def cart_view(req):
     user = User.objects.get(username=req.user)
     cart = user.cart.all()
