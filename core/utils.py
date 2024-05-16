@@ -1,6 +1,8 @@
-from django.shortcuts import render
 from django.contrib import messages
+from django.core.mail import send_mail
 from .models import *
+from django.utils import timezone
+import uuid
 
 def validateRegister(req):
     username = req.POST["username"].strip()
@@ -31,3 +33,20 @@ def validateRegister(req):
             messages.add_message(req, messages.ERROR, 'Error: ' + str(e))
             return False
     return user
+
+def sendOTP(user_instance):
+    otp = uuid.uuid4().hex[:4] # this should be changed to a random 4 chars not hex values
+    user_instance.otp = otp
+    user_instance.otpTime = timezone.now()
+    user_instance.save()
+    try:
+        send_mail(
+            "OTP Verification",
+            f"Your OTP is {otp}",
+            'otp@sportshunt.in',
+            [user_instance.email],
+            fail_silently=False
+        )
+    except Exception as e:
+        return False
+    return True

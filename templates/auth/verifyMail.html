@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+    <h1>Verifying mail address has been sent to {{ user.email }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" maxlength="4" placeholder="Enter OTP" required name="otp">
+
+        <button type="submit">Verify</button>
+    </form>
+{% endblock %}

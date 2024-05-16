@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from .models import *
@@ -50,12 +50,45 @@ def register_view(req):
         user = validateRegister(req)
         if user:
             login(req, user)
-            if user.is_organiser:
-                return HttpResponseRedirect(reverse("organisers:index"))
-            return HttpResponseRedirect(reverse("core:index"))
+            return redirect("core:verifyMail")
+        
         return render(req, "auth/register.html")
     else:
         return render(req, "auth/register.html")
+
+@login_required(login_url="/login/")
+def verifyMail_view(req):
+    user = req.user
+    user_instance = User.objects.get(id=user.id)
+    
+    if user.verified:
+        messages.add_message(req, messages.INFO, 'Email already verified')
+        return redirect("core:index")
+    
+    if req.method == "POST":
+        otp = req.POST["otp"]
+        valid_otp = user_instance.otp == otp and user_instance.otpTime > timezone.now() - timezone.timedelta(minutes=5)
+        if valid_otp:
+            user_instance.verified = True
+            user_instance.save()
+            messages.add_message(req, messages.SUCCESS, 'Email Verified Successfully')
+            
+            if user.is_organiser:
+                return HttpResponseRedirect(reverse("organisers:index"))
+            return HttpResponseRedirect(reverse("core:index"))
+        
+        messages.add_message(req, messages.ERROR, 'Invalid OTP or OTP Expired')
+        return render(req, "auth/verifyMail.html") 
+    
+    print(user_instance.otpTime)
+    if not user_instance.otpTime or user_instance.otpTime < timezone.now() - timezone.timedelta(minutes=5):
+        if sendOTP(user_instance):
+            messages.add_message(req, messages.INFO, 'OTP sent to your email')
+        else:
+            messages.add_message(req, messages.ERROR, 'Error sending OTP')            
+
+    return render(req, "auth/verifyMail.html")
+
 
 def organisation_view(req, org_name):
     if not (Organisation.objects.filter(name=org_name).exists()):

@@ -10,7 +10,6 @@ from .decorators import organiser_required, host_required, OrgHost_required
 
 @OrgHost_required
 def index(req):
-    # we can move this inside @organiser_required decorator
     organisation = req.session.get("organisation", None)
     org = Organisation.objects.get(id= organisation)
     tourns = Tournament.objects.filter(org= org)
