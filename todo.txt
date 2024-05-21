@@ -1,7 +1,0 @@
-upComing -> OnGoing matches ✅
-Scoreboard
-    -> whole tournament's matches.
-    -> particular Category
-
-    -> scoring page 
-        -> +1, -1, reset, declare winner.

@@ -74,6 +74,9 @@ class Team(models.Model):
         #     raise ValidationError("Team size exceeded.")
         super().save(*args, **kwargs)
     
+    def name(self):
+        return f"{self.members.all()}"
+    
     def __str__(self) -> str:
         return f"{self.category.tournament.name}>{self.category.catagory_type} -- {[mem.name for mem in self.members.all()]}"
     
