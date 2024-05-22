@@ -87,11 +87,18 @@ def create_fixture(req, tournament_name, category_name):
     category_instance = tournament_instance.categories.get(catagory_type= category_name)
     # if category_instance.fixture:
     #     return Response({"error": "Fixture already exists"}, status=status.HTTP_400_BAD_REQUEST)
+    tournament_instance.onGoing_matches.clear()
+    tournament_instance.save()
     fixture_instance = Fixtures.objects.create(
         category= category_instance,
         )
-    fixture = knockoutFixtureGenerator()
-    response = fixture.initialBracket(fixture_instance.id)
+    fixture = KnockOutFixture()
+    try:
+        response = fixture.initialBracket(fixture_instance.id)
+    except Exception as e:
+        return Response({"error": f"Error creating fixture: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
     if not response:
         return Response({"error": "Error creating fixture"}, status=status.HTTP_400_BAD_REQUEST)
     return Response({
@@ -117,7 +124,9 @@ def update_winner(req, tournament_name, category_name):
     fixture_instance = category_instance.fixture
     if not fixture_instance:
         return Response({"error": "Fixture not found"}, status=status.HTTP_404_NOT_FOUND)
-    status_ = knockoutFixtureGenerator().add_winners(fixture_instance.id, winner_team_id)
+    
+    fixture = KnockOutFixture()
+    status_ = fixture.add_winners_new(fixture_instance.id, winner_team_id)
     return Response({"message": status_}, status=status.HTTP_200_OK)
 
 # @OrgHost_required
@@ -263,7 +272,7 @@ def declare_match_winner(req):
 
         match_instance.match_state = True
         match_instance.save()
-        knockoutFixtureGenerator().add_winners(fixture_instance.id, match_instance.winner.id)
+        KnockOutFixture().add_winners(fixture_instance.id, match_instance.winner.id)
         return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
 
     current_set = match_instance.current_set
@@ -288,7 +297,16 @@ def declare_match_winner(req):
     else:
         match_instance.match_state = True
         match_instance.save()
-        knockoutFixtureGenerator().add_winners(fixture_instance.id, current_set.winner.id)
+        KnockOutFixture().add_winners(fixture_instance.id, current_set.winner.id)
         return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
 
     return Response({"message": "Set completed"}, status=status.HTTP_200_OK)
+
+@api_view(["GET", "POST"])
+def fixtureJSON(req, fixture_id):
+    if not Fixtures.objects.filter(id=fixture_id).exists():
+        return Response({"error": "Fixture not found"}, status=status.HTTP_404_NOT_FOUND)
+    fixture_instance = Fixtures.objects.get(id=fixture_id)
+    serializers = FixtureSerializer(fixture_instance)
+    return Response(serializers.data["fixture"], status=status.HTTP_200_OK)
+    

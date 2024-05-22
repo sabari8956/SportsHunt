@@ -131,22 +131,22 @@ def category_view(req, tournament_name, category_name):
     tournament_instance = Tournament.objects.get(name=tournament_name)
     category_instance = tournament_instance.categories.get(catagory_type=category_name)
     serializers = CategoryViewSerializer(category_instance, many=False).data
-    print(serializers) 
-#{'catagory_type': 'U18BS', 'details': 'under 18 boys singles', 'price': 899, 'fixture': None, 'teams': []}
     teams = [team['members'] for team in serializers["teams"]]
     fixture_data = serializers["fixture"]
+    
     upcoming_matches, stage = None, 'Fixture not Created Yet!'
     if fixture_data:
         upcoming_matches = fixture_data.get("currentBracket")
-        stage = stages_dict.get(fixture_data["currentStage"], "Not Started -")
+        stage = stages_dict.get(fixture_data["currentStage"] + 1, "Not Started -")
     
     return render(req, "organisers/category.html", {
         "tournament_data": tournament_instance,
         "category_data": category_instance,
-        "fixture_data": fixture_data,
+        "fixture_id": fixture_data['id'] if fixture_data else None,
         "teams": teams,
         "upcoming_matches": upcoming_matches,
         "stage": stage,
+
     })
     
 @OrgHost_required

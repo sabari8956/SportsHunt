@@ -129,7 +129,7 @@ class FixtureSerializer(serializers.ModelSerializer):
     currentWinners = TeamSerializer(many=True, read_only=True)
     class Meta:
         model = Fixtures
-        fields = ['id', 'status', 'currentStage', 'currentBracket', 'currentWinners']
+        fields = ['id', 'status', 'currentStage', 'currentBracket', 'currentWinners', 'fixture']
         depth = 1
     
     def to_representation(self, instance):

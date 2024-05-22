@@ -1,0 +1,81 @@
+<div class="flex flex-col prose">
+    <div class="w-full max-w-screen-xl mx-auto">
+      <script src="https://unpkg.com/gojs"></script>
+      <div id="allSampleContent" class="p-4 w-full">
+        <script id="code">
+          async function init() {
+            const $ = go.GraphObject.make;
+            myDiagram = new go.Diagram('myDiagramDiv', {
+              'textEditingTool.starting': go.TextEditingStarting.SingleClick,
+              'textEditingTool.textValidation': isValidScore,
+              layout: $(go.TreeLayout, { angle: 180 }),
+              'undoManager.isEnabled': true,
+            });
+
+            function isValidScore(textblock, oldstr, newstr) {
+              if (newstr === '') return true;
+              const num = parseInt(newstr, 10);
+              return !isNaN(num) && num >= 0 && num < 1000;
+            }
+
+            myDiagram.nodeTemplate = $(go.Node, 'Auto', { selectable: false },
+              $(go.Shape, 'Rectangle', { fill: '#8C8C8C', stroke: null }),
+              $(go.Panel, 'Table',
+                $(go.RowColumnDefinition, { column: 0, separatorStroke: 'black' }),
+                $(go.RowColumnDefinition, { column: 1, separatorStroke: 'black', background: '#BABABA' }),
+                $(go.RowColumnDefinition, { row: 0, separatorStroke: 'black' }),
+                $(go.RowColumnDefinition, { row: 1, separatorStroke: 'black' }),
+                $(go.TextBlock, '', {
+                  row: 0, wrap: go.Wrap.None, margin: 5, width: 90, isMultiline: false, textAlign: 'left', font: '10pt  Segoe UI,sans-serif', stroke: 'white',
+                }, new go.Binding('text', 'player1').makeTwoWay()),
+                $(go.TextBlock, '', {
+                  row: 1, wrap: go.Wrap.None, margin: 5, width: 90, isMultiline: false, textAlign: 'left', font: '10pt  Segoe UI,sans-serif', stroke: 'white',
+                }, new go.Binding('text', 'player2').makeTwoWay()),
+                $(go.TextBlock, '', {
+                  column: 1, row: 0, wrap: go.Wrap.None, margin: 2, width: 25, isMultiline: false, editable: false, textAlign: 'center', font: '10pt  Segoe UI,sans-serif', stroke: 'black',
+                }, new go.Binding('text', 'score1').makeTwoWay()),
+                $(go.TextBlock, '', {
+                  column: 1, row: 1, wrap: go.Wrap.None, margin: 2, width: 25, isMultiline: false, editable: false, textAlign: 'center', font: '10pt  Segoe UI,sans-serif', stroke: 'black',
+                }, new go.Binding('text', 'score2').makeTwoWay())
+              )
+            );
+
+            myDiagram.linkTemplate = $(go.Link, { routing: go.Routing.Orthogonal, selectable: false },
+              $(go.Shape, { strokeWidth: 2, stroke: 'white' })
+            );
+
+            async function fetchTeams() {
+              const response = await fetch('{% url "api:get_fixture_json" fixture_id %}');
+              const teams = await response.json();
+              console.log(teams);
+              return teams;
+            }
+
+            const teams = await fetchTeams();
+            const model = new go.TreeModel(teams);
+            model.addChangedListener((e) => {
+              if (e.propertyName !== 'score1' && e.propertyName !== 'score2') return;
+              const data = e.object;
+              if (isNaN(data.score1) || isNaN(data.score2)) return;
+
+              const parent = myDiagram.findNodeForKey(data.parent);
+              if (parent === null) return;
+
+              const playerName = parseInt(data.score1) > parseInt(data.score2) ? data.player1 : data.player2;
+              if (parseInt(data.score1) === parseInt(data.score2)) playerName = '';
+              myDiagram.model.setDataProperty(parent.data, data.parentNumber === 0 ? 'player1' : 'player2', playerName);
+            });
+
+            myDiagram.model = model;
+
+          }
+
+          window.addEventListener('DOMContentLoaded', init);
+        </script>
+
+        <div id="sample">
+          <div id="myDiagramDiv" style="border: solid 1px black; background: #4d4d4d; width: 700px; height: 600px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
