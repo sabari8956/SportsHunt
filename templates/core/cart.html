@@ -1,10 +1,10 @@
 {% extends "base.html" %}
+ {% block title %}
+  Cart 
+ {% endblock title %} 
 
-{% block title %}
-Cart
-{% endblock title %}
 
-{% block body %}
+ {% block body %}
 <h1 class="text-2xl font-bold mb-4 text-white">Cart Items</h1>
 <div class="w-full overflow-x-auto">
   {% for team in cart %}
@@ -21,7 +21,85 @@ Cart
   </div>
   {% endfor %}
 </div>
-  <div class="text-xl font-bold text-white">Total: ₹{{ total }}</div>
-  <br>
-  <a href="#" class="px-4 py-2 bg-gray-700 rounded-lg text-white">Checkout</a>
+<div class="text-xl font-bold text-white">Total: ₹{{ total }}</div>
+<br />
+<button class="px-4 py-2 bg-gray-700 rounded-lg text-white" id="pay-btn">
+  Check Out
+</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.getElementById("pay-btn").onclick = (e) => {
+    e.preventDefault();
+    const url = "{% url 'api:create_order' %}";
+    console.log(url);
+    fetch(url, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+    },
+    body: JSON.stringify({}),
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+            } 
+        else {
+            console.error('Error:', response.status);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+        }
+    )
+    .then(data => {
+        console.log(data);
+        const key = data.razorpay_merchant_key;
+        const order_id = data.razorpay_order_id;
+        const amount = data.razorpay_amount;
+        const currency = data.currency;
+        const callbackURL = `http://127.0.0.1:8000/checkout/`;
+
+        var option = {
+            key: key,
+            amount: amount,
+            currency: currency,
+            name: 'SportsHunt',
+
+            order_id: order_id,
+            callback_url: callbackURL,
+        };
+        console.log(option);
+        var rzp = new Razorpay(option, {
+            handler: false,
+        });
+        rzp.open();
+        e.preventDefault();
+    })
+    .catch(error => {
+        
+        console.error('Error:', error);
+    });
+    // const data = response.json();
+    // const key = data.razorpay_merchant_key;
+    // const order_id = data.razorpay_order_id;
+    // const amount = data.razorpay_amount;
+    // const currency = data.currency;
+    // const callbackURL = `http://127.0.0.1:8000/checkout`;
+
+    // var option = {
+    //   key: key,
+    //   amount: amount,
+    //   currency: currency,
+    //   name: "SportsHunt",
+
+    //   order_id: order_id,
+    //   callback_url: callbackURL,
+    // };
+
+    // var rzp = new Razorpay(option);
+    // rzp.open();
+    // e.preventDefault();
+  };
+
+</script>
 {% endblock body %}

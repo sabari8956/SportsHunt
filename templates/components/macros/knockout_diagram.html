@@ -1,8 +1,10 @@
+{% if fixture_id %}
 <div class="flex flex-col prose">
     <div class="w-full max-w-screen-xl mx-auto">
       <script src="https://unpkg.com/gojs"></script>
       <div id="allSampleContent" class="p-4 w-full">
         <script id="code">
+
           async function init() {
             const $ = go.GraphObject.make;
             myDiagram = new go.Diagram('myDiagramDiv', {
@@ -79,3 +81,5 @@
       </div>
     </div>
   </div>
+
+{% endif %}

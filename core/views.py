@@ -11,6 +11,9 @@ from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from organisers.forms import *
 from .utils import *
+from sportshunt.conf import dev as settings
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 
@@ -128,3 +131,58 @@ def cart_view(req):
         "cart": cart_data,
         "total":total,
     })
+    
+@csrf_exempt
+def checkout(req):
+    if req.method != "POST":
+        return render(req, "errors/404.html")
+    
+    payment_id = req.POST.get('razorpay_payment_id', '')
+    razorpay_order_id = req.POST.get('razorpay_order_id', '')
+    signature = req.POST.get('razorpay_signature', '')
+    
+    params_dict = {
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_payment_id': payment_id,
+        'razorpay_signature': signature
+    }
+    
+    try:
+        order_instance = Order.objects.get(order_id=razorpay_order_id)
+        razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID,
+                                settings.RAZOR_KEY_SECRET))
+        
+        result = razorpay_client.utility.verify_payment_signature(params_dict)
+        if result is not None:
+            amount = order_instance.amount
+            try:
+                razorpay_client.payment.capture(payment_id, amount)
+                order_instance.status = 'paid'
+                order_instance.save()
+                #checkout
+                user_instance = order_instance.user
+                cart_data = user_instance.cart.all()
+                for item in cart_data:
+                    item.category.teams.add(item)
+                user_instance.cart.remove(*cart_data)
+                user_instance.cart.clear()
+                
+                messages.add_message(req, messages.SUCCESS, 'Payment successful, and checkout done.')
+                return redirect('core:cart')
+            
+            except Exception as e:
+                order_instance.status = 'failed'
+                order_instance.save()
+                print(e)
+                messages.add_message(req, messages.ERROR, f'Payment failed {e}')
+                return render(req, "payments/failed.html")
+            
+    except Exception as e:
+        print(e)
+        order_instance.status = 'failed'
+        order_instance.save()
+        return render(req, "payments/failed.html")
+    
+    order_instance.status = 'failed'
+    order_instance.save()
+    return render(req, "payments/failed.html")

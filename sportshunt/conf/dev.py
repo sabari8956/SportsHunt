@@ -1,12 +1,19 @@
 from .common import *
 import os
-
+import razorpay
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
 DEBUG = os.environ.get("DEBUG")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(' ')
+RAZOR_KEY_ID = os.environ.get("RAZOR_KEY_ID")
+RAZOR_KEY_SECRET = os.environ.get("RAZOR_KEY_SECRET")
+CSRF_TRUSTED_ORIGINS = ['https://api.razorpay.com']
+
+
 
 # Database  [ dev will use sqlite3 / prod will be mysql ]
 

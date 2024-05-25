@@ -7,6 +7,9 @@ from .serializer import *
 from django.shortcuts import redirect
 from django.contrib import messages
 from organisers.utils import *
+from sportshunt.conf import dev as settings
+from django.urls import reverse
+import razorpay
 # from django.contrib.auth.decorators import login_required
 # from organisers.decorators import host_required, OrgHost_required 
 # NEED TO CREATE API VERSION DECORATORS
@@ -66,14 +69,14 @@ def add_to_cart(req):
     messages.add_message(req, messages.SUCCESS, "added to cart successfully")
     return Response({"message": data}, status=status.HTTP_200_OK)
 
-# @login_required
-@api_view(["GET","POST"])
+
 def checkout(req):
     user_instance = User.objects.get(username= req.user)
     cart_data = user_instance.cart.all()
     for item in cart_data:
         item.category.teams.add(item)
     user_instance.cart.remove(*cart_data)
+    user_instance.cart.clear()
     return Response({"message": "Checkout was  successfully"}, status=status.HTTP_200_OK)
 
 # @OrgHost_required 
@@ -310,3 +313,54 @@ def fixtureJSON(req, fixture_id):
     serializers = FixtureSerializer(fixture_instance)
     return Response(serializers.data["fixture"], status=status.HTTP_200_OK)
     
+@api_view(["POST"])
+def create_order(request):
+    if not request.user.is_authenticated:
+        return Response({'status': 'not authenticated'} , status=401)
+    
+    user_instance = User.objects.get(id=request.user.id)
+    cart_data = user_instance.cart.all()
+    
+    team_ids = []
+    total_amount = 0
+    for item in cart_data:
+        team_ids.append(item.id)
+        total_amount += item.category.price
+    
+    if total_amount == 0:
+        return Response({'status': 'cart is empty'} , status=400)
+    
+    currency = 'INR'
+    amount = total_amount * 100
+    try:
+        razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID,
+                                        settings.RAZOR_KEY_SECRET))
+        
+        razorpay_order = razorpay_client.order.create(dict(amount=amount,
+                                                        currency=currency,
+                                                        payment_capture='0'))
+        
+    except Exception as e:
+        return Response({"error": f'error from razorpay side {e}'}, status=400)
+        
+    razorpay_order_id = razorpay_order['id']
+    callback_url = reverse('core:checkout')
+    
+    response = {}
+    response['razorpay_order_id'] = razorpay_order_id
+    response['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
+    response['razorpay_amount'] = amount
+    response['currency'] = currency
+    response['callback_url'] = callback_url
+    
+    
+    
+    order_instance = Order.objects.create(user=user_instance,
+                                          order_id=razorpay_order_id,
+                                          amount=amount, status='pending'
+                                          )
+    
+    order_instance.cart_items.set(cart_data)
+    order_instance.save()
+    print(response)
+    return Response(response)
