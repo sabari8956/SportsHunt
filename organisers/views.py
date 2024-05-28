@@ -6,6 +6,8 @@ from api.serializer import *
 from .models import *
 from .forms import *
 from .decorators import organiser_required, host_required, OrgHost_required
+from .validators import *
+
 # Create your views here.
 
 @OrgHost_required
@@ -21,20 +23,15 @@ def index(req):
 
 @organiser_required
 def organisation_creation_form(req):
-    # Convert all these into serializers
-    # need to change to api soon
     if req.method == "POST":
-        form = OrganaisationForm(req.POST)
-        if form.is_valid():
-            req.session["organisation"] = form.save(admin= req.user).id
+        
+        if OrganisationValidator(req).clean_validate_save():
             return redirect("organisers:index")
         
         return render(req, "organisers/organisation_form.html", {
-            "form": form 
             })
     
-    return render(req, "organisers//organisation_form.html",{
-        "form": OrganaisationForm(),
+    return render(req, "organisers/organisation_form.html",{
     })
 
 
