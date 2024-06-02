@@ -8,7 +8,7 @@
             Venue
         </div>
         <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
-            <a href="{% url 'core:organisation' org_name=tournament_data.org  %}">{{ tournament_data.org }} </a> <br />
+            <a href="{% url 'core:organisation' org_name=tournament_data.org  %}">{{ tournament_data.org }} </a> <br>
             {{ tournament_data.start_date }} to {{ tournament_data.end_date }} <br />
             {{ tournament_data.venue }}
         </div>

@@ -1,17 +1,183 @@
-{% extends "organisers/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}
-Create Organisation
+Create Category
 {% endblock title %}
 
 {% block body %}
+    <section class="h-screen bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+        <form action="" method="post" class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+            {% csrf_token %}
+            <ol
+                class="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
+                <li
+                    class="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 dark:text-primary-500 dark:after:border-gray-700 sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
+                    <span
+                        class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden">
+                        <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        Tournament
+                    </span>
+                </li>
 
-    <br>
-    <br>
-    <br>
-    Add a new category
-    <div class="max-w-sm mx-auto">
+                <li
+                    class="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200  dark:after:border-gray-700 sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
+                    <span
+                        class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden">
+                        <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        Categories
+                    </span>
+                </li>
 
-        {% include "components\organisers\new_category_form.html" %}
-    </div>
+                <li class="flex shrink-0 items-center">
+                    <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    Finalize
+                </li>
+            </ol>
+
+            <div class="mt-6 sm:mt-8 lg:flex lg:items-start lg:gap-12 xl:gap-16">
+                <div class="min-w-0 flex-1 space-y-8">
+                    <div class="space-y-4">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Category Details</h2>
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                            <div class="mb-5">
+                                <label for="text"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category
+                                    Type</label>
+                                <input type="text" id="catgorytype" name="category_type"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="standard" required />
+                            </div>
+
+                            <!-- <div class="mb-5">
+                                <label for="text"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Details</label>
+                                <input type="text" id="details" name="details"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    required />
+                            </div> -->
+                            <div class="mb-5">
+                                <label for="price"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Participation
+                                    Price </label>
+                                <input type="text" id="price" name="price"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="eg. 599" required />
+                            </div>
+
+
+                            <div>
+
+                                <label for="details"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Details</label>
+                                <textarea id="details" rows="4" name="details"
+                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="Write the address here..."></textarea>
+
+                            </div>
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+                                    <div class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Fixture Type
+                                    </div>
+                                    <div class="flex gap-10">
+
+                                        <div class="inline-flex items-center">
+                                            <label class="relative flex items-center p-3 rounded-full cursor-pointer"
+                                                htmlFor="custom-style1">
+                                                <input name="fixture_type" type="radio" value="knockout"
+                                                    class="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-full border border-gray-300 bg-gray-700 p-0 text-gray-300 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-300 checked:before:bg-gray-300 hover:before:opacity-0"
+                                                    id="custom-style1" checked/>
+                                                <span
+                                                    class="absolute text-gray-300 transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                        fill="#1a1a1a" class="w-full h-full scale-105">
+                                                        <path fill-rule="evenodd"
+                                                            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </span>
+                                            </label>
+                                            <label class="mt-px font-light text-gray-300 cursor-pointer select-none"
+                                                htmlFor="custom-style1">
+                                                <p
+                                                    class="block font-sans text-base antialiased font-normal leading-relaxed text-gray-300">
+                                                    Knockout
+                                                </p>
+                                            </label>
+                                        </div>
+
+                                        <div class="inline-flex items-center">
+                                            <label class="relative flex items-center p-3 rounded-full cursor-pointer"
+                                                htmlFor="custom-style2">
+                                                <input name="fixture_type" type="radio" value="roundrobin"
+                                                    class="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-full border border-gray-300 bg-gray-700 p-0 text-gray-300 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-300 checked:before:bg-gray-300 hover:before:opacity-0"
+                                                    id="custom-style2" />
+                                                <span
+                                                    class="absolute text-gray-300 transition-opacity opacity-0 pointer-events-none top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 peer-checked:opacity-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                        fill="#1a1a1a" class="w-full h-full scale-105">
+                                                        <path fill-rule="evenodd"
+                                                            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </span>
+                                            </label>
+                                            <label class="mt-px font-light text-gray-300 cursor-pointer select-none"
+                                                htmlFor="custom-style2">
+                                                <p
+                                                    class="block font-sans text-base antialiased font-normal leading-relaxed text-gray-300">
+                                                    Round Robin
+                                                </p>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="mb-5">
+                                        <label for="max_age"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Max
+                                            Age</label>
+                                        <input type="text" id="maxage" name="max_age"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            required />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <button type="button" data-ripple-light="true"
+                    class="mt-6 align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-blue-600 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none">
+                    Save & create another
+                </button>
+                
+                <button type="submit" data-ripple-light="true"
+                    class="mt-6 align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-blue-600 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none">
+                    save & return
+                </button>
+            </div>
+        </form>
+    </section>
 {% endblock body %}

@@ -7,7 +7,7 @@ from .models import *
 from .forms import *
 from .decorators import organiser_required, host_required, OrgHost_required
 from .validators import *
-
+from django.urls import reverse
 # Create your views here.
 
 @OrgHost_required
@@ -40,7 +40,7 @@ def organisation_page(req): # org selection page
     org = Organisation.objects.filter(admin= req.user)
     orgs = [_org.id for _org in org]
     if req.method == "POST":
-        opt = int(req.POST["option"])
+        opt = int(req.POST["organisation"])
         if opt in orgs:
             req.session["organisation"] = opt
         else:
@@ -59,48 +59,25 @@ def organisation_page(req): # org selection page
     })
     
 @OrgHost_required
-# change this to API soon.
 def tournament_creation_form(req):
     # Convert all these into serializers
     if req.method == "POST":
-        form = TournamentForm(req.POST)
-        if form.is_valid():
-            form.save(org= req.session["organisation"])
-            return redirect("organisers:index")
-
-        return render(req, "organisers/tournament_form.html", {
-            "form": form 
-            })
-
+        if tourn := TournamentValidator(req).clean_validate_save():
+            return redirect(reverse("organisers:create_categories", kwargs={'tournament_name': tourn.name}))
+        
     return render(req, "organisers/tournament_form.html",{
-        "form": TournamentForm(),
     })
 
 @OrgHost_required
 @host_required
 def create_categories(req, tournament_name):
-    tournament = Tournament.objects.get(name=tournament_name)
-    serializer = CreateCategoriesTournamentSerializer(tournament).data
-    cats = serializer["categories"]
-    if req.POST:
-        form = CategoriesForm(req.POST)
-        if form.is_valid():
-            if form.cleaned_data["catagory_type"] in cats:
-                messages.add_message(req, messages.ERROR, 'Category already exists.')
-                return render(req, r"organisers\create_catogry_form.html", {
-                    "form": form ,
-                })
-            else:
-                cat = form.save(tournament=tournament)
-                tournament.categories.add(cat)
-            return redirect("organisers:index")# redirect to the category page in future
-        return render(req, r"organisers\create_catogry_form.html", {
-            "form": form 
-            })
+    
+    if req.method == "POST":
+        print(req.POST)
+        if cat := CategoryValidator(req, tournament_name).clean_validate_save():
+            return redirect(reverse("organisers:category", kwargs={'tournament_name': tournament_name, "category_name": cat.catagory_type}))
+    return render(req, "organisers/create_catogry_form.html", )
 
-    return render(req, r"organisers\create_catogry_form.html",{
-        "form": CategoriesForm(),
-    })
 
 @OrgHost_required
 @host_required

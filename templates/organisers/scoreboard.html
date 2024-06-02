@@ -13,7 +13,7 @@ Scoring
 match got over
 {% else %}
 {{match_data.match_state}}
-<div class="flex justify-center my-8">
+<!-- <div class="flex justify-center my-8">
     <div class="bg-white shadow-md rounded-lg w-full max-w-md px-4 py-6">
         <div class="flex justify-between">
             <div class="flex items-center">
@@ -69,6 +69,7 @@ match got over
         })
 
     }
+
     function decrement_score(team_id, url) {
         console.log(team_id);
         var score = document.getElementById(`team-${team_id}-score`);
@@ -85,6 +86,7 @@ match got over
             })
         })
     }
+
     function declare_winner(match_id, tournament_id) {
         fetch("{% url 'api:declare_winner' %}", {
             method: 'POST',
@@ -106,7 +108,9 @@ match got over
         });
     }
 
-</script>
+</script> -->
 
+
+{% include "components\organisers\scoreboard.html" %}
 {% endif %}
 {% endblock body %}

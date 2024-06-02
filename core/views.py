@@ -14,7 +14,6 @@ from .utils import *
 from sportshunt.conf import dev as settings
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
-# Create your views here.
 
 
 def index(req):
@@ -22,7 +21,7 @@ def index(req):
     now = timezone.now()
     end_date = now + timedelta(days=15)
     upcoming_tournaments = Tournament.objects.filter(start_date__range=(now, end_date)).order_by('start_date')[:5]
-    # print(upcoming_tournaments)x
+    # print(upcoming_tournaments)
     return render(req, "core/index.html", {
         "messages":messages,
         "upcoming_tournaments": upcoming_tournaments,
@@ -103,7 +102,7 @@ def organisation_view(req, org_name):
     return render(req, "core/organisation.html", {
         "org_data": serializer.data,
     })
-    
+
 def organisation_tournament_view(req, tournament_name):
     if not (Tournament.objects.filter(name=tournament_name).exists()):
         return render(req, "errors/tournament_not_found.html", {
@@ -111,9 +110,12 @@ def organisation_tournament_view(req, tournament_name):
         })
     tournament = Tournament.objects.get(name=tournament_name)
     serializer = OrgTournamentSerializer(tournament, many=False)
+    print(serializer.data)
     return render(req, "core/tournament.html", {
         "tournament_data": serializer.data,  
     })
+    
+# have to create a category view
 
 @login_required(login_url="/login/") # maybe rewrite this
 def cart_view(req):
@@ -123,7 +125,7 @@ def cart_view(req):
     total = 0
     for item in cart:
         item_dict = {}
-        item_dict["members"] = item.members.all()
+        item_dict["members"] = [f'{player.name}' for player in item.members.all()]
         item_dict["category"] = item.category
         cart_data.append(item_dict)
         total += item.category.price
@@ -131,7 +133,7 @@ def cart_view(req):
         "cart": cart_data,
         "total":total,
     })
-    
+
 @csrf_exempt
 def checkout(req):
     if req.method != "POST":
@@ -146,8 +148,8 @@ def checkout(req):
         'razorpay_payment_id': payment_id,
         'razorpay_signature': signature
     }
-    
-    try:
+
+    if order_instance := Order.objects.filter(order_id=razorpay_order_id).exists():
         order_instance = Order.objects.get(order_id=razorpay_order_id)
         razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID,
                                 settings.RAZOR_KEY_SECRET))
@@ -171,16 +173,9 @@ def checkout(req):
                 return redirect('core:cart')
             
             except Exception as e:
-                order_instance.status = 'failed'
-                order_instance.save()
-                print(e)
                 messages.add_message(req, messages.ERROR, f'Payment failed {e}')
-                return render(req, "payments/failed.html")
-            
-    except Exception as e:
-        print(e)
-        order_instance.status = 'failed'
-        order_instance.save()
+                return redirect('core:cart')
+    else:
         return render(req, "payments/failed.html")
     
     order_instance.status = 'failed'

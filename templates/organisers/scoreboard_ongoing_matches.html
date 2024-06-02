@@ -1,12 +1,12 @@
 {% extends "organisers/base.html" %}
 
 {% block title %}
-    OnGoing Matches 
+OnGoing Matches
 {% endblock title %}
 
 
 {% block body %}
-    {% for match in ongoing_matches %}
+<!-- {% for match in ongoing_matches %}
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center">
@@ -37,5 +37,34 @@
         </div>
       </div>
       <br>
-    {% endfor %}
+    {% endfor %} -->
+<div class="">
+
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center dark:text-gray-100">Select a Match</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for match in ongoing_matches %}
+            <!-- Single Match Card -->
+            <div class="bg-white dark:bg-gray-900 dark:text-gray-100 shadow-lg rounded-lg overflow-hidden">
+                <div class="p-6">
+                    <h2 class="text-xl font-bold mb-2">
+                        {% for player in match.team1.members %}
+                        {{player}}
+                        {% endfor %} 
+                        vs
+                        {% for player in match.team2.members %}
+                        {{player}}
+                        {% endfor %}</h2>
+                    <p class="text-gray-700 dark:text-gray-300 mb-4">category details or something</p>
+                    <a href="{% url 'organisers:scoreboard' tournament_name match.id %}"
+                        class="bg-blue-500 dark:bg-blue-700 text-white px-4 py-2 rounded">Select Match</a>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
 {% endblock body %}

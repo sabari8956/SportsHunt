@@ -1,0 +1,151 @@
+<div class="dark">
+    <!-- Landscape Alert for Small Screens -->
+    <div class="landscape-alert hidden text-center bg-yellow-400 text-gray-800 p-4 rounded">
+        Please rotate your device to landscape mode for the best experience.
+    </div>
+
+    <!-- Main Content -->
+    <div class="content flex flex-col items-center justify-center space-y-8">
+        <h1 class="text-3xl font-bold mb-6 text-center">ScoreBoard</h1>
+        <div class="flex flex-col md:flex-row md:space-x-8 space-y-8 md:space-y-0">
+            <!-- Counter 1 -->
+            <div class="bg-gray-800 p-8 rounded shadow-lg text-center">
+                <h1 class="text-2xl font-bold mb-4">Team 1</h1>
+                <div id="counter1" class="text-4xl font-semibold mb-4">{{match_data.current_set.team1_score}}</div>
+                <div class="flex justify-center space-x-4">
+                    <button id="decrease1"
+                        class="border border-white text-white bg-gray-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Decrease</button>
+                    <button id="increase1"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Increase</button>
+                </div>
+            </div>
+
+            <!-- Counter 2 -->
+            <div class="bg-gray-800 p-8 rounded shadow-lg text-center">
+                <h1 class="text-2xl font-bold mb-4">Team 2</h1>
+                <div id="counter2" class="text-4xl font-semibold mb-4">{{ match_data.current_set.team2_score}}</div>
+                <div class="flex justify-center space-x-4">
+                    <button id="decrease2"
+                        class="border border-white text-white bg-gray-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Decrease</button>
+                    <button id="increase2"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Increase</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Declare Winner Button -->
+        <button type="button" id="declare_winner"
+            class="text-white bg-gray-800 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Declare
+            Winner</button>
+    </div>
+    <script>
+        const counterElement1 = document.getElementById('counter1');
+        const counterElement2 = document.getElementById('counter2');
+        let count1 = '{{match_data.current_set.team1_score}}';
+        let count2 = '{{match_data.current_set.team2_score}}';
+
+        document.getElementById('increase1').addEventListener('click', () => {
+            count1++;
+            counterElement1.textContent = count1;
+
+            let url = "{% url 'api:increment_score' match_data.id match_data.team1.id %}";
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'team_id': '{{match_data.team1.id}}'
+                    })
+                })
+        });
+
+        document.getElementById('decrease1').addEventListener('click', () => {
+            count1--;
+            if (count1 < 0) {
+                alert("team 1 score cant be below 0")
+                count1++;
+            }
+            else {
+                counterElement1.textContent = count1;
+                let url = "{% url 'api:decrement_score' match_data.id match_data.team1.id %}";
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'team_id': '{{match_data.team1.id}}'
+                    })
+                })
+            }
+
+        });
+
+        document.getElementById('increase2').addEventListener('click', () => {
+            count2++;
+            counterElement2.textContent = count2;
+            let url = "{% url 'api:increment_score' match_data.id match_data.team2.id %}";
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'team_id': '{{match_data.team2.id}}'
+                    })
+                })
+
+        });
+
+        document.getElementById('decrease2').addEventListener('click', () => {
+            count2--;
+            if (count2 < 0) {
+                alert("team 1 score cant be below 0")
+                count2++;
+            }
+            else {
+                counterElement2.textContent = count2;
+                let url = "{% url 'api:decrement_score' match_data.id match_data.team2.id %}";
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'team_id': '{{match_data.team2.id}}'
+                    })
+                })
+            }
+            counterElement2.textContent = count2;
+        });
+
+        document.getElementById('declare_winner').addEventListener('click', () => {
+            let url = "{% url 'api:declare_winner' %}"
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'match_id': '{{match_data.id}}',
+                    'tournament_id': '{{tournament_data.id}}'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = "{% url 'organisers:ongoing_matches' tournament_data.name %}";
+            })
+            .catch(error => {
+                alert('some error occured ' + error)
+            })
+            
+        })
+    </script>
+
+</div>

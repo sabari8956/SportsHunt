@@ -137,6 +137,7 @@ class FixtureSerializer(serializers.ModelSerializer):
         return dict(data)
 
 # Serializer for creating tournaments with categories
+# currently not using this serializer
 class CreateCategoriesTournamentSerializer(serializers.ModelSerializer):
     class CategoriesNameSerializer(serializers.ModelSerializer):
         class Meta:

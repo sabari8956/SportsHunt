@@ -28,9 +28,10 @@ class Tournament(models.Model):
     mods = models.ManyToManyField(User, related_name='tournament_mod', blank= True)
     start_date = models.DateField()
     end_date = models.DateField()
-    game = models.ForeignKey('Game', on_delete=models.SET_NULL, related_name='tournament_game', blank= True, null= True)
+    game = models.ForeignKey('Game', on_delete=models.SET_NULL, related_name='tournament_game', blank= True, null= True , default=1)
     categories = models.ManyToManyField('Category', related_name='tournament_catagory', blank= True)
-    venue = models.CharField('Venue', max_length=254, default="TBA")
+    venue = models.CharField('Venue', max_length=1024, default="TBA")
+    venue_link = models.URLField('Venue Link', max_length=1024, blank= True, null= True)
     onGoing_matches = models.ManyToManyField('Match', related_name='tournament_on_going_matches', blank= True)
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(" ", "_")
@@ -59,8 +60,10 @@ class Category(models.Model):
     team_size = models.IntegerField(default=1)
     teams = models.ManyToManyField('Team', related_name='category_team', blank= True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    # fixture_type =  create a model fr types of fixture and add it here
     fixture = models.ForeignKey('Fixtures', on_delete=models.SET_NULL, related_name="this_fixture", blank= True, null= True)
     winner = models.ForeignKey('Team', on_delete=models.SET_NULL, related_name='category_winner', blank= True, null= True)
+    registration = models.BooleanField(default=False)
     def __str__(self) -> str:
         return f"{self.tournament} -> {self.catagory_type}"
 
