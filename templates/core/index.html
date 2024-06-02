@@ -6,19 +6,98 @@ Home
 
 {% block body %}
 
-{% if user.is_authenticated  %}
-    <h1>Hello, {{user}} </h1>
-    {% if user.is_organiser %}
-        <p>You are a organiser!</p>
-    {% endif %}
-    <a href="{% url 'core:logout' %}">Logout</a>
-{% else %}
-    <h1>Hello, World</h1>
-    <a href="{% url 'core:login' %}">Login</a>
-    <a href="{% url 'core:register' %}">register</a>
-{% endif %}
 
-{% for up_coming in upcoming_tournaments %}
-    {% include "components\macros\tournament_card.html" with tournament_data=up_coming %}
-{% endfor %}
+<div class="">
+    <div class="p-8">
+        <div class="flex justify-between items-center my-8">
+            <h2 class="text-4xl font-extrabold dark:text-white">Upcoming Matches</h2>
+            <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
+        </div>
+
+        <div class="flex gap-4">
+            {% for tourn in upcoming_tournaments %}
+
+            <a href="{% url 'core:tournament' tournament_name=tourn.name %}"
+                class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
+                <span
+                    class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
+                {% for cat in tourn.categories.all %}
+                <span
+                    class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">{{ cat.catagory_type }}</span>
+                {% endfor %}
+            </a>
+            {% empty %}
+            NO UPCOMING TOURNAMENTS
+            {% endfor %}
+
+        </div>
+    </div>
+    <div class="p-8">
+        <div class="flex justify-between items-center my-8">
+            <h2 class="text-4xl font-extrabold dark:text-white">Ongoing Matches</h2>
+            <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
+        </div>
+
+        <div class="flex gap-4">
+
+            {% for tourn in ongoing_tournaments %}
+
+            <a href="{% url 'core:tournament' tournament_name=tourn.name %}"
+                class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
+                <span
+                    class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
+                {% for cat in tourn.categories.all %}
+                <span
+                    class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">{{ cat.catagory_type }}</span>
+                {% endfor %}
+            </a>
+            {% empty %}
+            NO OnGoing TOURNAMENTS
+            {% endfor %}
+
+        </div>
+
+    </div>
+    <div class="p-8">
+        <div class="flex justify-between items-center my-8">
+            <h2 class="text-4xl font-extrabold dark:text-white">Recent Matches</h2>
+            <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
+        </div>
+
+        <div class="flex gap-4">
+
+            {% for tourn in recent_tournaments %}
+    
+            <a href="{% url 'core:tournament' tourn.name %}"
+                class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+    
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
+                <span
+                    class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
+                <br>
+                {% for cat in tourn.categories.all %}
+                <span
+                    class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">
+                    {{ cat.catagory_type }}</span>
+                {% endfor %}
+            </a>
+            {% empty %}
+            NO Recent TOURNAMENTS
+            {% endfor %}
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
 {% endblock body %}

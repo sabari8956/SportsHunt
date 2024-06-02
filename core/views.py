@@ -19,12 +19,17 @@ from django.views.decorators.csrf import csrf_exempt
 def index(req):
     messages = req._messages
     now = timezone.now()
+    now_date = now.date()
     end_date = now + timedelta(days=15)
-    upcoming_tournaments = Tournament.objects.filter(start_date__range=(now, end_date)).order_by('start_date')[:5]
-    # print(upcoming_tournaments)
+    upcoming_tournaments = Tournament.objects.filter(start_date__range=(now, end_date)).order_by('start_date')[:4]    
+    ongoing_tournaments = Tournament.objects.filter(start_date=now_date)[:4]
+    recent_tournaments = Tournament.objects.filter(start_date__lt=now_date).order_by('-start_date')[:4]
+    
     return render(req, "core/index.html", {
         "messages":messages,
         "upcoming_tournaments": upcoming_tournaments,
+        "ongoing_tournaments": ongoing_tournaments,
+        "recent_tournaments": recent_tournaments,
     })
 
 def login_view(req):
@@ -103,7 +108,7 @@ def organisation_view(req, org_name):
         "org_data": serializer.data,
     })
 
-def organisation_tournament_view(req, tournament_name):
+def tournament_view(req, tournament_name):
     if not (Tournament.objects.filter(name=tournament_name).exists()):
         return render(req, "errors/tournament_not_found.html", {
             "tournament_name": tournament_name, 
@@ -116,6 +121,10 @@ def organisation_tournament_view(req, tournament_name):
     })
     
 # have to create a category view
+def category_view(req, tournament_name, category_name):
+    
+    ...
+    
 
 @login_required(login_url="/login/") # maybe rewrite this
 def cart_view(req):

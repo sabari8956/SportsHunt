@@ -10,5 +10,5 @@ urlpatterns = [
     path('cart/', cart_view, name="cart"),
     path('checkout/', checkout, name="checkout"),
     path('organisation/<str:org_name>/', organisation_view, name="organisation"),
-    path('tournament/<str:tournament_name>/', organisation_tournament_view, name='organisation_tournament'),
+    path('tournament/<str:tournament_name>/', tournament_view, name='tournament'),
 ]
