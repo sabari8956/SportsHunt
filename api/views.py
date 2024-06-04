@@ -62,6 +62,9 @@ def add_to_cart(req):
     if len(players_instances) != team_size:
         return Response({"error": f"Team size must be {team_size}"}, status=status.HTTP_400_BAD_REQUEST)
 
+    if category_instance.registration:
+        return Response({"error": "Registration closed"}, status=status.HTTP_400_BAD_REQUEST)
+    
     team_instance = Team.objects.create(category=category_instance)
     team_instance.members.set(players_instances)
     user_instance = User.objects.get(username=req.user)
@@ -70,14 +73,6 @@ def add_to_cart(req):
     return Response({"message": data}, status=status.HTTP_200_OK)
 
 
-def checkout(req):
-    user_instance = User.objects.get(username= req.user)
-    cart_data = user_instance.cart.all()
-    for item in cart_data:
-        item.category.teams.add(item)
-    user_instance.cart.remove(*cart_data)
-    user_instance.cart.clear()
-    return Response({"message": "Checkout was  successfully"}, status=status.HTTP_200_OK)
 
 # @OrgHost_required 
 # @host_required
@@ -149,39 +144,36 @@ def view_fixture(req, tournament_name, category_name):
         return Response({"message": "Fixture completed", "winner":serializers.data['currentWinners'][0]}, status=status.HTTP_200_OK)
     return Response(serializers.data, status=status.HTTP_200_OK)
 
-# @OrgHost_required
-# @host_required
-@api_view(["GET","POST"])
-def schedule_match(req, tournament_name, category_name):
-    match_id = req.data.get('match_id', None)
-    court_id = req.data.get('court_id', None)
+
+
+@api_view(["POST"])
+def schedule_match(req):
+    data = req.data
+    match_ids = data.get('match_id', None)
+    print(match_ids)
+
+    if not match_ids:
+        return Response({"error": "Match ID is required"}, status=status.HTTP_400_BAD_REQUEST)
     
-    tournament_instance = Tournament.objects.get(name= tournament_name)
-    category_instance = tournament_instance.categories.get(catagory_type= category_name)
-    fixture_instance = category_instance.fixture
-    if not fixture_instance:
-        return Response({"error": "Fixture not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    category_matches = [ match.id for match in fixture_instance.currentBracket.all()]
-    if not (Match.objects.filter(id=match_id).exists()):
-        return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    match_instance = Match.objects.get(id=match_id)
-    if not (match_instance.match_category.id == category_instance.id):
-        return Response({"error": "match ID and category id doesnt match"}, status=status.HTTP_400_BAD_REQUEST)
-    if not match_instance.id in category_matches:
-        return Response({"error": "Match not found in the fixture"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if court_id:
-        match_instance.court = court_id
-        match_instance.save()
-    
-    fixture_instance.currentBracket.remove(match_instance)
-    tournament_instance.onGoing_matches.add(match_instance)
-    tournament_instance.save()
-
-    return Response({"message":"match Scheduled"}, status=status.HTTP_200_OK)
-
+    for match_id in match_ids:
+        if not Match.objects.filter(id=match_id).exists():
+            return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
+        match_instance = Match.objects.get(id=match_id)
+        category_instance = match_instance.match_category
+        tournament_instance = category_instance.tournament
+        fixture_instance = category_instance.fixture
+        if not fixture_instance:
+            return Response({"error": "Fixture not found"}, status=status.HTTP_400_BAD_REQUEST)
+        if tournament_instance.org.admin != req.user:
+            return Response({"error": "You are not authorised to schedule matches"}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            fixture_instance.currentBracket.remove(match_instance)
+            tournament_instance.onGoing_matches.add(match_instance)
+            tournament_instance.save()
+        except Exception as e:
+            return Response({"error": f"Error scheduling match: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"message": "Match scheduled"}, status=status.HTTP_200_OK)
+            
 # @OrgHost_required
 # @host_required
 @api_view(["GET", "POST"])  
@@ -364,3 +356,55 @@ def create_order(request):
     order_instance.save()
     print(response)
     return Response(response)
+
+
+@api_view(["POST"])
+def register_player(req):
+    #this doesnt work fr doubles and more. only singles
+    data = req.data
+    print(data)
+    name = data.get('name')
+    category_id = data.get('category')
+    print(name, category_id)
+    if not (name and category_id):
+        return Response({"error": "Name and category ID are required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not Category.objects.filter(id=int(category_id)).exists():
+        return Response({"error": "Invalid category ID"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    category_instance = Category.objects.get(id=int(category_id))
+    if category_instance.registration:
+        messages.add_message(req, messages.ERROR, "Registration closed")
+        return Response({"error": "Registration closed"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    team_instance = Team.objects.create(category=category_instance, payment_method=False)
+    team_instance.members.set([Player.objects.create(name=name)])
+    
+    category_instance.teams.add(team_instance)
+    category_instance.save()
+    
+    messages.add_message(req, messages.SUCCESS, "Player registered successfully")
+    return Response(data, status=status.HTTP_200_OK)
+
+# @host_required
+@api_view(["POST"])
+def close_registration(req, tournament_name, category_name=None):
+    if req.user != Tournament.objects.get(name=tournament_name).org.admin:
+        return Response("You are not authorised to close registration", status=status.HTTP_403_FORBIDDEN)
+    
+    if not Tournament.objects.filter(name=tournament_name).exists():
+        return Response("Tournament not found", status=status.HTTP_404_NOT_FOUND)
+    
+    tournament_instance = Tournament.objects.get(name=tournament_name)
+    
+    if not category_name:
+        all_categories = tournament_instance.categories.all()
+        for category in all_categories:
+            category.registration = True
+            category.save()
+        return Response("Registration closed for all categories", status=status.HTTP_200_OK)
+    
+    category_instance = tournament_instance.categories.get(catagory_type=category_name)
+    category_instance.registration = True
+    category_instance.save()
+    return Response(f"Registration closed for {category_name}", status=status.HTTP_200_OK)

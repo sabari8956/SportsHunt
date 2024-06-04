@@ -72,6 +72,7 @@ class Player(models.Model):
 class Team(models.Model):
     members = models.ManyToManyField(Player, related_name='team_members', blank= True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    payment_method = models.BooleanField(default=True)
     def save(self, *args, **kwargs):
         # if len(self.members.all()) > self.category.team_size:
         #     raise ValidationError("Team size exceeded.")

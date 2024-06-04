@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}
+Category
+{% endblock title %}
+
+{% block body %}
+
+<div class="dark p-8">
+    <div class="flex">
+        
+        <div class="w-1/2">
+            {% if category_data.registration %}
+                <mark class="px-2 text-white bg-blue-600 rounded dark:bg-red-500">Registration: closed</mark>
+            {% else %}
+                <mark class="px-2 text-white bg-blue-600 rounded dark:bg-green-500">Registration: open</mark>
+            
+            {% endif %}
+            <mark class="px-2 text-white bg-blue-600 rounded dark:bg-blue-500">{{tournament_data.game}}</mark>
+            <h1
+                class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+                {{category_data.catagory_type}} </h1>
+            <div
+                class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Details</h2>
+                <address
+                    class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-2">
+                    <div class="space-y-2 text-gray-500 dark:text-gray-400 leading-loose sm:block">
+                        fixture type <br>
+                        Stage <br>
+                        Venue
+                    </div>
+
+                    <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
+                        Knockout <br>
+                        {{stage}}<br>
+                        {{tournament_data.venue}}
+                    </div>
+
+                </address>
+                <div class="py-4">
+                    <h2>Count Down</h2>
+                    <div id="countdown-container"
+                        class="max-w-[150px] mx-auto grid grid-cols-3 gap-2 text-center font-sans"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="w-1/2 flex flex-col items-center p-8">
+            <img width="400px" src="https://picsum.photos/seed/picsum/400/500" alt="placeholder">
+        </div>
+    </div>
+
+    {% if category_data.registration %}
+        <div class="w-3/4">
+            <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+                <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab"
+                    data-tabs-toggle="#default-styled-tab-content"
+                    data-tabs-active-classes="text-purple-600 hover:text-purple-600 dark:text-purple-500 dark:hover:text-purple-500 border-purple-600 dark:border-purple-500"
+                    data-tabs-inactive-classes="dark:border-transparent text-gray-500 hover:text-gray-600 dark:text-gray-400 border-gray-100 hover:border-gray-300 dark:border-gray-700 dark:hover:text-gray-300"
+                    role="tablist">
+                    <li class="me-2" role="presentation">
+                        <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-styled-tab"
+                            data-tabs-target="#styled-profile" type="button" role="tab" aria-controls="profile"
+                            aria-selected="false">Players</button>
+                    </li>
+                    <li class="me-2" role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                            id="settings-styled-tab" data-tabs-target="#styled-settings" type="button" role="tab"
+                            aria-controls="settings" aria-selected="false">Fixture</button>
+                    </li>
+                    <li class="me-2" role="presentation">
+                        <button
+                            class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                            id="dashboard-styled-tab" data-tabs-target="#styled-dashboard" type="button" role="tab"
+                            aria-controls="dashboard" aria-selected="false">Matches</button>
+                    </li>
+                </ul>
+            </div>
+            <div id="default-styled-tab-content">
+                <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-profile" role="tabpanel"
+                    aria-labelledby="profile-tab">
+                    {% for team in teams %}
+                    <li class="flex items-center">
+                        <svg class="w-3.5 h-3.5 me-2 text-gray-500 dark:text-gray-400 flex-shrink-0" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                        </svg>
+                        {% for player in team %}
+                        {{ player }}
+                        {% endfor %}
+                    </li>
+                    {% endfor %}            
+                </div>
+                <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-settings" role="tabpanel"
+                    aria-labelledby="settings-tab">
+
+                    {% include "components\macros\knockout_diagram.html" %}
+                </div>
+                <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-dashboard" role="tabpanel"
+                    aria-labelledby="dashboard-tab">
+
+                    {% for match in upcoming_matches  %}
+
+                        <div class="">
+                            {{match.team1.members}} vs {{match.team2.members}} <br>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    {% endif %}
+
+
+    <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/tabs.js"></script>
+    <script>
+        // Set the date and time you want to count down to
+        const countDownDate = new Date("Jun 26, 2024 18:00:00").getTime();
+
+        // Update the count down every 1 second
+        const x = setInterval(function () {
+            // Get today's date and time
+            const now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            const distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes, and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            // const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Create the countdown container and items
+            const countdownContainer = document.getElementById("countdown-container");
+            countdownContainer.innerHTML = `
+      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
+        <div class="text-xl font-bold text-gray-800">${days}</div>
+        <div class="text-sm text-gray-600">Days</div>
+      </div>
+      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
+        <div class="text-xl font-bold text-gray-800">${hours}</div>
+        <div class="text-sm text-gray-600">Hours</div>
+      </div>
+      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
+        <div class="text-xl font-bold text-gray-800">${minutes}</div>
+        <div class="text-sm text-gray-600">Minutes</div>
+      </div>
+    `;
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                countdownContainer.innerHTML = "<p>EXPIRED</p>";
+            }
+        }, 1000);
+    </script>
+
+</div>
+
+
+
+
+
+{% endblock body %}

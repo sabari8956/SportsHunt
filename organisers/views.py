@@ -5,20 +5,32 @@ from utils import *
 from api.serializer import *
 from .models import *
 from .forms import *
-from .decorators import organiser_required, host_required, OrgHost_required
+from .decorators import organiser_required, host_required
 from .validators import *
 from django.urls import reverse
+from django.utils import timezone
+from datetime import timedelta
 # Create your views here.
 
-@OrgHost_required
+@host_required
 def index(req):
     organisation = req.session.get("organisation", None)
     org = Organisation.objects.get(id= organisation)
     tourns = Tournament.objects.filter(org= org)
     tournament_serializer = BasicTournamentSerializer(tourns, many=True)
+    now = timezone.now()
+    now_date = now.date()
+    end_date = now + timedelta(days=15)
+    upcoming_tournaments = tourns.filter(start_date__range=(now, end_date)).order_by('start_date')[:3]    
+    ongoing_tournaments = tourns.filter(start_date=now_date)[:3]
+    recent_tournaments = tourns.filter(start_date__lt=now_date).order_by('-start_date')[:3]
+    
     return render(req, "organisers/organiser_index.html", {
         "organisation": org.name,
-        "tournaments": tournament_serializer.data
+        "tournaments": tournament_serializer.data,
+        "upcoming_tournaments": upcoming_tournaments,
+        "ongoing_tournaments": ongoing_tournaments,
+        "recent_tournaments": recent_tournaments,
     })
 
 @organiser_required
@@ -58,7 +70,7 @@ def organisation_page(req): # org selection page
         "orgs": org,
     })
     
-@OrgHost_required
+@organiser_required
 def tournament_creation_form(req):
     # Convert all these into serializers
     if req.method == "POST":
@@ -68,7 +80,7 @@ def tournament_creation_form(req):
     return render(req, "organisers/tournament_form.html",{
     })
 
-@OrgHost_required
+
 @host_required
 def create_categories(req, tournament_name):
     
@@ -79,7 +91,6 @@ def create_categories(req, tournament_name):
     return render(req, "organisers/create_catogry_form.html", )
 
 
-@OrgHost_required
 @host_required
 def org_tournament_view(req, tournament_name):
     tournament = Tournament.objects.get(name=tournament_name)
@@ -88,7 +99,6 @@ def org_tournament_view(req, tournament_name):
         "tournament_data": serializer.data,
     })
 
-@OrgHost_required
 @host_required
 def category_view(req, tournament_name, category_name):
     
@@ -123,7 +133,7 @@ def category_view(req, tournament_name, category_name):
 
     })
     
-@OrgHost_required
+
 @host_required
 def score_ongoingMatches(req, tournament_name):
     tournament_instance = Tournament.objects.get(name=tournament_name)
@@ -135,7 +145,6 @@ def score_ongoingMatches(req, tournament_name):
         "tournament_name": tournament_instance.name,
     })
 
-@OrgHost_required 
 @host_required
 def scoreboard_view(req, tournament_name, match_id):
     tournament_instance = Tournament.objects.get(name=tournament_name)
@@ -158,4 +167,17 @@ def scoreboard_view(req, tournament_name, match_id):
     return render(req, "organisers/scoreboard.html", {
         "tournament_data": tournament_instance,
         "match_data": match_serializer,
+    })
+    
+
+@host_required
+def scoreboard(req):
+    organisation = req.session.get("organisation", None)
+    org = Organisation.objects.get(id= organisation)
+    tourns = Tournament.objects.filter(org= org)
+    now = timezone.now()
+    now_date = now.date()
+    ongoing_tournaments = tourns.filter(start_date=now_date)
+    return render(req, "organisers/ongoing_tournaments.html", {
+        "tournaments": ongoing_tournaments,
     })

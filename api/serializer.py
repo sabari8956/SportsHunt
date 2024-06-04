@@ -66,7 +66,7 @@ class CategorySerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Category
-        fields = ['catagory_type' , 'details', 'price']
+        fields = ['id', 'catagory_type' , 'details', 'price', 'registration']
         
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -100,6 +100,14 @@ class TeamSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        name = ''
+        l_mem = len(data['members'])
+        for i, player in enumerate(data['members']):
+            if i == l_mem - 1:
+                name += player
+            else:
+                name += player + ', '
+        data['members'] = name
         return dict(data)
 
 # Serializer for match details
@@ -196,7 +204,7 @@ class CategoryViewSerializer(serializers.ModelSerializer):
     teams = TeamSerializer(many=True, read_only=True)
     class Meta:
         model = Category
-        fields = ['catagory_type', 'details', 'price', 'fixture', 'teams']
+        fields = ['catagory_type', 'details', 'price', 'fixture', 'teams', 'registration']
         depth = 1
 
 # Serializer for ongoing matches in a tournament

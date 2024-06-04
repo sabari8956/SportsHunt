@@ -122,9 +122,34 @@ def tournament_view(req, tournament_name):
     
 # have to create a category view
 def category_view(req, tournament_name, category_name):
+    tournament_instance = Tournament.objects.get(name=tournament_name)
+    category_instance = Category.objects.get(catagory_type=category_name, tournament=tournament_instance)    
+    data = CategoryViewSerializer(category_instance, many=False).data
+    fixture_data = data['fixture']
+    teams = [team['members'] for team in data["teams"]]
     
-    ...
+    upcoming_matches, stage = None, "Not Started"
+    if fixture_data:
+        upcoming_matches = fixture_data["currentBracket"]
+        stages_dict = {
+            None: 'Not Started',
+            0: 'Completed',
+            1: 'Finals',
+            2: 'Semi Finals',
+            3: 'Quater Finals',
+            4: 'Round of 16',
+            5: 'Round of 32',
+        }
+        stage = stages_dict.get(int(fixture_data["currentStage"]), None)
     
+    return render(req, "core/category.html", {
+        "category_data": data,
+        "tournament_data": tournament_instance,
+        "fixture_id": fixture_data['id'] if fixture_data else None,
+        "teams": teams,
+        "upcoming_matches": upcoming_matches,
+        "stage": stage,
+    })
 
 @login_required(login_url="/login/") # maybe rewrite this
 def cart_view(req):
@@ -136,8 +161,12 @@ def cart_view(req):
         item_dict = {}
         item_dict["members"] = [f'{player.name}' for player in item.members.all()]
         item_dict["category"] = item.category
-        cart_data.append(item_dict)
-        total += item.category.price
+        if not item.category.registered:
+            cart_data.append(item_dict)
+            total += item.category.price
+        else:
+            user.cart.remove(item)
+            user.save()
     return render(req, "core/cart.html", {
         "cart": cart_data,
         "total":total,

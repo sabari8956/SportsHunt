@@ -14,14 +14,12 @@
 
 <body class="dark:bg-gray-800">
    {% include 'components\organisers\navBar_sideBar.html' %}
-   <div class="p-2 sm:ml-64 ">
-      <div class="p-2 rounded-lg dark:border-gray-700 mt-14">
-         <div>
-            {% block body %}
-            {% endblock body %}
-         </div>
-      </div>
+   <div class="mt-14">
+
+      {% block body %}
+      {% endblock body %}
    </div>
+
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 
