@@ -222,36 +222,56 @@ def decrement_score(req, match_id, team_id):
 # @host_required
 @api_view(["POST"])
 def declare_match_winner(req):
-    # if not req.user.is_authenticated:
-    #     return Response({"error": "Login required"}, status=status.HTTP_401_UNAUTHORIZED)
-
     #validate user and tournament
     match_id = req.data.get('match_id', None)
     tournament_id = req.data.get('tournament_id', None)
+    
     if not (match_id and tournament_id):
+        print('match_id and tournament_id are required')
         return Response({"error": "Match ID and tournament ID are required"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         match_instance = Match.objects.get(id=match_id)
+    
     except Match.DoesNotExist:
+        print('Invalid match ID')
         return Response({"error": "Invalid match ID"}, status=status.HTTP_400_BAD_REQUEST)
 
     if match_instance.match_state:
+        print('Match completed')
         return Response({"error": "Match completed"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         tournament_instance = Tournament.objects.get(id=tournament_id)
     except Tournament.DoesNotExist:
+        print('Invalid tournament ID')
         return Response({"error": "Invalid tournament ID"}, status=status.HTTP_400_BAD_REQUEST)
 
     if match_instance not in tournament_instance.onGoing_matches.all():
+        print('Match not found in the tournament')
         return Response({"error": "Match not found in the tournament"}, status=status.HTTP_400_BAD_REQUEST)
 
     fixture_instance = match_instance.match_category.fixture
     if not fixture_instance:
+        print('Fixture not found')
         return Response({"error": "Fixture not found"}, status=status.HTTP_400_BAD_REQUEST)
 
+    current_set = match_instance.current_set
+    team1_score = current_set.team1_score
+    team2_score = current_set.team2_score
+
+    if team1_score > team2_score:
+        current_set.winner = match_instance.team1
+    elif team2_score > team1_score:
+        current_set.winner = match_instance.team2
+    else:
+        return Response({"message": "Set can't be a draw"}, status=status.HTTP_403_FORBIDDEN)
+
+    current_set.set_status = True
+    current_set.save()
+
     completed_sets = match_instance.sets_scores.filter(set_status=True)
+    print(completed_sets, match_instance.sets)
     if len(completed_sets) == match_instance.sets:
         team1_wins = completed_sets.filter(winner=match_instance.team1).count()
         team2_wins = completed_sets.filter(winner=match_instance.team2).count()
@@ -270,19 +290,7 @@ def declare_match_winner(req):
         KnockOutFixture().add_winners(fixture_instance.id, match_instance.winner.id)
         return Response({"message": "Match completed"}, status=status.HTTP_200_OK)
 
-    current_set = match_instance.current_set
-    team1_score = current_set.team1_score
-    team2_score = current_set.team2_score
-
-    if team1_score > team2_score:
-        current_set.winner = match_instance.team1
-    elif team2_score > team1_score:
-        current_set.winner = match_instance.team2
-    else:
-        return Response({"message": "Set can't be a draw"}, status=status.HTTP_403_FORBIDDEN)
-
-    current_set.set_status = True
-    current_set.save()
+    print('Sets not completed')
 
     set_ids = [s.id for s in match_instance.sets_scores.all()]
     current_set_index = set_ids.index(current_set.id)
