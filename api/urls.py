@@ -2,8 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', OrganisationApi, name="org"),
-    path('add_to_cart/', add_to_cart, name="add_to_cart"),
+    path('add_to_cart/', add_to_cart, name="add_to_cart"), 
     path('create_order/', create_order, name="create_order"),
     path('offline_register/', register_player, name="offline_register"),
     path('declare_winner/', declare_match_winner, name='declare_winner'),

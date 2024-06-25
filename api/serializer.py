@@ -204,7 +204,7 @@ class CategoryViewSerializer(serializers.ModelSerializer):
     teams = TeamSerializer(many=True, read_only=True)
     class Meta:
         model = Category
-        fields = ['catagory_type', 'details', 'price', 'fixture', 'teams', 'registration']
+        fields = ['id', 'catagory_type', 'details', 'price', 'fixture', 'teams', 'registration', 'winner']
         depth = 1
 
 # Serializer for ongoing matches in a tournament

@@ -127,12 +127,14 @@ class KnockOutFixture:
 
         fixtureJSON = fixture_instance.fixture
         currentStage = fixture_instance.currentStage -1 
-        
+        print(f'winmers {winners}')
         if len(winners) == 1:
+            print("WINNER FOUND", winners[0])
             fixture_instance.currentStage -= 1
             fixture_instance.category.winner = Team.objects.get(id=winners_ids[0])
             fixture_instance.status = True
             fixture_instance.save()
+            fixture_instance.category.save()
             return winners
         
         fixture_instance.currentWinners.clear()
@@ -181,6 +183,7 @@ class KnockOutFixture:
         
         thisfixture_onGoingMatches = [match for match in fixture_instance.currentBracket.all()]
         scheduled_matches = [match for match in tournament_instance.onGoing_matches.all() if match.match_category == category_instance]
+        print(f'moving to next bracket>{not (thisfixture_onGoingMatches or scheduled_matches)}')
         if not (thisfixture_onGoingMatches or scheduled_matches):
             print(f'next bracket')
             self.nextBracket(fixture_instance.id)

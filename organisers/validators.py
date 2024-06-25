@@ -1,5 +1,7 @@
 from .models import *
 from django.contrib import messages
+from datetime import datetime, timedelta
+import re
 
 def clean_querydict(querydict):
     return {k: v[-1] for k, v in querydict.lists()}
@@ -59,8 +61,6 @@ class OrganisationValidator:
         return self.save()
     
 
-import re
-from datetime import datetime
 
 class TournamentValidator:
     def __init__(self, req):
@@ -147,8 +147,8 @@ class TournamentValidator:
             self.errors.append('Start date cannot be later than end date')
             return False
         
-        if start_date < datetime.now():
-            self.errors.append('Start date cannot be in the past')
+        if start_date < datetime.now() - timedelta(days=1):
+            self.errors.append('Start date cannot be before today')
             return False
         
 
