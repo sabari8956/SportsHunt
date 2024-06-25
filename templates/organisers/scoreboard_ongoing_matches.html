@@ -48,13 +48,10 @@ OnGoing Matches
             <div class="bg-white dark:bg-gray-900 dark:text-gray-100 shadow-lg rounded-lg overflow-hidden">
                 <div class="p-6">
                     <h2 class="text-xl font-bold mb-2">
-                        {% for player in match.team1.members %}
-                        {{player}}
-                        {% endfor %} 
-                        vs
-                        {% for player in match.team2.members %}
-                        {{player}}
-                        {% endfor %}</h2>
+                        {{match.team1.members}}
+                        <span class="text-gray-500">VS</span>
+                        {{match.team2.members}}  
+                      </h2>
                     <p class="text-gray-700 dark:text-gray-300 mb-4">category details or something</p>
                     <a href="{% url 'organisers:scoreboard' tournament_name match.id %}"
                         class="bg-blue-500 dark:bg-blue-700 text-white px-4 py-2 rounded">Select Match</a>

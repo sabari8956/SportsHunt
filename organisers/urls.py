@@ -7,6 +7,7 @@ urlpatterns = [
     path('my_orgs/', organisation_page, name="orgs"),
     path('new_tournament/', tournament_creation_form, name="new_tournament"),
     path('scoreboard/', scoreboard, name="scoreboard"),
+    path('revenue/<str:tournament_name>/', revenue_analysis, name="revenue"),
     path('tournament/<str:tournament_name>/',org_tournament_view , name="tournament"),
     path('tournament/<str:tournament_name>/new_category/', create_categories, name="create_categories"),
     path('tournament/<str:tournament_name>/matches/', score_ongoingMatches, name='ongoing_matches'),    

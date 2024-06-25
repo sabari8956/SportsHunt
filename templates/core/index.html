@@ -8,53 +8,85 @@ Home
 
 
 <div class="">
+    {% if upcoming_tournaments %}
+      
     <div class="p-8">
         <div class="flex justify-between items-center my-8">
             <h2 class="text-4xl font-extrabold dark:text-white">Upcoming Matches</h2>
             <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex flex-col md:flex-row gap-4">
             {% for tourn in upcoming_tournaments %}
 
-            <a href="{% url 'core:tournament' tournament_name=tourn.name %}"
-                class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
-                <span
-                    class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
-                {% for cat in tourn.categories.all %}
-                <span
-                    class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">{{ cat.catagory_type }}</span>
-                {% endfor %}
-            </a>
+            <div class="bg-gray-600 text-white rounded-lg p-4 max-w-sm w-full md:w-80"> <!-- Adjusted width for mobile friendliness -->
+                <h2 class="text-2xl font-bold mb-2">{{ tourn.name }}</h2>
+                <p class="text-gray-400 mb-4">by {{ tourn.org.name }}</p>
+                
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>{{ tourn.venue }}</span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>{{tourn.start_date}}</span>
+                </div>
+                
+                <a href="{% url 'core:tournament' tourn.name %}" class="bg-gray-700 text-white py-2 px-4 rounded-md w-full hover:bg-gray-600 transition duration-300">
+                    Learn More
+                </a>
+            </div>
             {% empty %}
             NO UPCOMING TOURNAMENTS
             {% endfor %}
-
         </div>
     </div>
+    {% else %}
+        <!-- add some kind of illustration -->
+         Add some kind of illustration
+
+    {% endif %}
+    {% if ongoing_tournaments %}
+      
     <div class="p-8">
         <div class="flex justify-between items-center my-8">
             <h2 class="text-4xl font-extrabold dark:text-white">Ongoing Matches</h2>
             <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex flex-col md:flex-row gap-4">
 
             {% for tourn in ongoing_tournaments %}
 
-            <a href="{% url 'core:tournament' tournament_name=tourn.name %}"
-                class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
-                <span
-                    class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
-                {% for cat in tourn.categories.all %}
-                <span
-                    class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">{{ cat.catagory_type }}</span>
-                {% endfor %}
-            </a>
+            <div class="bg-gray-600 text-white rounded-lg p-4 max-w-sm w-full md:w-80"> <!-- Adjusted width for mobile friendliness -->
+                <h2 class="text-2xl font-bold mb-2">{{ tourn.name }}</h2>
+                <p class="text-gray-400 mb-4">by {{ tourn.org.name }}</p>
+                
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>{{ tourn.venue }}</span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>{{tourn.start_date}}</span>
+                </div>
+                
+                <a href="{% url 'core:tournament' tourn.name %}" class="bg-gray-700 text-white py-2 px-4 rounded-md w-full hover:bg-gray-600 transition duration-300">
+                    Learn More
+                </a>
+            </div>
             {% empty %}
             NO OnGoing TOURNAMENTS
             {% endfor %}
@@ -62,35 +94,52 @@ Home
         </div>
 
     </div>
+    {% endif %}
+    {% if recent_tournaments %}
+      
     <div class="p-8">
+        
         <div class="flex justify-between items-center my-8">
             <h2 class="text-4xl font-extrabold dark:text-white">Recent Matches</h2>
             <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex flex-col md:flex-row gap-4"> 
 
             {% for tourn in recent_tournaments %}
-    
-            <a href="{% url 'core:tournament' tourn.name %}"
-                class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-    
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
-                <span
-                    class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
-                <br>
-                {% for cat in tourn.categories.all %}
-                <span
-                    class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">
-                    {{ cat.catagory_type }}</span>
-                {% endfor %}
-            </a>
+        
+            <div class="bg-gray-600 text-white rounded-lg p-4 max-w-sm w-full md:w-80"> <!-- Adjusted width for mobile friendliness -->
+                <h2 class="text-2xl font-bold mb-2">{{ tourn.name }}</h2>
+                <p class="text-gray-400 mb-4">by {{ tourn.org.name }}</p>
+                
+                <div class="flex items-center mb-2">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>{{ tourn.venue }}</span>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>{{tourn.start_date}}</span>
+                </div>
+                
+                <a href="{% url 'core:tournament' tourn.name %}" class="bg-gray-700 text-white py-2 px-4 rounded-md w-full hover:bg-gray-400 transition duration-300">
+                    Learn More
+                </a>
+            </div>
+            
             {% empty %}
-            NO Recent TOURNAMENTS
+            <p class="text-white">NO Recent TOURNAMENTS</p>
             {% endfor %}
         </div>
+        
 
     </div>
+    {% endif %}
 
 
 </div>

@@ -19,14 +19,15 @@ from .decorators import host_required, login_required
 @api_view(["POST"])
 def add_to_cart(req):
     data = req.data
-    print(data)
     if not data:
         return Response({"error": "Data is required"}, status=status.HTTP_400_BAD_REQUEST)
-    
     name = data.get('name')
     if not name:
         return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
     players_instances = Player.objects.create(name=name)
+
+    name_fields = [value for key, value in data.lists() if key.startswith('name_')]
+    players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
 
     category_id = data.get('category')
     if not category_id:
@@ -287,6 +288,7 @@ def fixtureJSON(req, fixture_id):
 @login_required
 @api_view(["POST"])
 def create_order(request):
+    print('here create order')
     if not request.user.is_authenticated:
         return Response({'status': 'not authenticated'} , status=401)
     
@@ -299,6 +301,7 @@ def create_order(request):
         team_ids.append(item.id)
         total_amount += item.category.price
     
+    print(cart_data, total_amount)
     if total_amount == 0:
         return Response({'status': 'cart is empty'} , status=400)
     
@@ -313,6 +316,7 @@ def create_order(request):
                                                         payment_capture='0'))
         
     except Exception as e:
+        print(f'error from razorpay side {e}')
         return Response({"error": f'error from razorpay side {e}'}, status=400)
         
     razorpay_order_id = razorpay_order['id']
@@ -399,3 +403,29 @@ def close_registration(req, tournament_name, category_name=None):
     category_instance.registration = True
     category_instance.save()
     return Response(f"Registration closed for {category_name}", status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def edit_mail(req):
+    print('here')
+    if not req.user.is_authenticated:
+        messages.add_message(req, messages.ERROR, "Not authenticated")
+        return redirect("core:login")
+    
+    user_instance = User.objects.get(id=req.user.id)
+    data = req.data
+    email = data.get('email')
+    if user_instance.verified:
+        messages.add_message(req, messages.ERROR, "Email already verified")
+        return Response("Email already verified", status=status.HTTP_403_FORBIDDEN)
+    
+    if User.objects.filter(email=email).exists():
+        print(User.objects.filter(email=email))
+        messages.add_message(req, messages.ERROR, "Email already exists")
+        return Response("Email already exists", status=status.HTTP_409_CONFLICT)
+    
+    user_instance.email = email
+    user_instance.save()
+    messages.add_message(req, messages.SUCCESS, "Email updated successfully")
+    return Response("Email updated successfully", status=status.HTTP_200_OK)
+    

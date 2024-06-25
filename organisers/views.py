@@ -10,6 +10,7 @@ from .validators import *
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
+from .validators import clean_querydict
 # Create your views here.
 
 @host_required
@@ -94,9 +95,31 @@ def create_categories(req, tournament_name):
 @host_required
 def org_tournament_view(req, tournament_name):
     tournament = Tournament.objects.get(name=tournament_name)
-    serializer = OrgTournamentSerializer(tournament, many=False)
+    serializer = OrgTournamentSerializer(tournament, many=False).data
+    serializer['status'] = 'Upcoming'
+    serializer['status_color'] = 'bg-green-500'
+    end_date_dt = datetime.strptime(serializer['end_date'], "%Y-%m-%d")
+    end_date_dt = timezone.make_aware(end_date_dt, timezone.get_current_timezone())
+    start_date_str = serializer['start_date']
+    start_date_dt = datetime.strptime(start_date_str, "%Y-%m-%d")
+    start_date_dt = timezone.make_aware(start_date_dt, timezone.get_current_timezone())
+
+    start_date_tim = start_date_dt.strftime("%b %d, %Y %H:%M:%S")
+    serializer['timer'] = start_date_tim
+    serializer['start_date'] = start_date_str
+    if end_date_dt < timezone.now():
+        serializer['status'] = "Completed"
+        serializer['status_color'] = 'bg-red-500'
+
+    
+    if start_date_dt < timezone.now() and end_date_dt > timezone.now():
+        serializer['status'] = "Ongoing"
+        serializer['status_color'] = 'bg-yellow-500'
+
+        
     return render(req, "organisers/org_tournament_view.html", {
-        "tournament_data": serializer.data,
+        "tournament_data": serializer,
+        "tournament_poster_url": tournament.get_poster(),
     })
 
 @host_required
@@ -128,6 +151,7 @@ def category_view(req, tournament_name, category_name):
         "category_data": category_instance,
         "fixture_id": fixture_data['id'] if fixture_data else None,
         "teams": teams,
+        "poster_url": tournament_instance.get_poster(), 
         "upcoming_matches": upcoming_matches,
         "stage": stage,
 
@@ -181,3 +205,33 @@ def scoreboard(req):
     return render(req, "organisers/ongoing_tournaments.html", {
         "tournaments": ongoing_tournaments,
     })
+    
+@organiser_required
+def revenue_analysis(req, tournament_name=None):
+    
+    if not tournament_name:
+        return HttpResponse("Revenue Analysis no tournament name provided")
+
+    tournament_instance = Tournament.objects.get(name=tournament_name)
+    categories_instance = tournament_instance.categories.all()
+
+    category_data = CategorySerializerAll(categories_instance, many=True).data
+    print(category_data)
+    for category in category_data:
+        print(category)
+        teams = category["teams"]
+        no_online_registrations = 0
+        for team in teams:
+            if team["payment_method"]:
+                no_online_registrations += 1
+        print(f"Category: {category['catagory_type']} -> Total Registrations: {len(teams)} -> Online Registrations: {no_online_registrations}")
+        category["total_registrations"] = len(teams)
+        category["online_registrations"] = no_online_registrations
+        category["Total_Revenue"] = category["price"] * len(teams)
+        category["Online_Revenue"] = category["price"] * no_online_registrations
+        
+    return render(req, "organisers/revenue.html", {
+        "category_data": category_data,
+    })
+            
+        

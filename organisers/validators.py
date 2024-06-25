@@ -14,6 +14,9 @@ class OrganisationValidator:
         self.errors = []
 
     def clean_and_validate_org_name(self, org_name):
+        if not org_name.strip():
+            self.errors.append('Enter a org name.')
+            return False
         org_name = org_name.lower().replace(" ", "_")
         self.data['org_name'] = org_name
 
@@ -24,6 +27,9 @@ class OrganisationValidator:
         return True
 
     def clean_and_validate_wh_num(self, wh_num):
+        if not wh_num.strip():
+            self.errors.append('Enter a number.')
+            return False
         try:
             self.data['wh_num'] = int(wh_num)
         except ValueError:
@@ -72,16 +78,16 @@ class TournamentValidator:
         self.errors = []
 
     def clean_and_validate_tournament_name(self, tournament_name):
-        print(f'validating {tournament_name}')
+        if not tournament_name.strip():
+            self.errors.append('Enter a tournament name.')
+            return False
         self.data['tournament_name'] = tournament_name.strip().lower().replace(" ", "_")
         if tournament_name and Tournament.objects.filter(name=tournament_name).exists():
             self.errors.append('Tournament name already exists.')
             return False
         return True
 
-    def clean_and_validate_game(self, game):
-        print(f'validating {game}')
-        
+    def clean_and_validate_game(self, game):        
         if not game:
             self.errors.append('Game not selected')
             return False
@@ -94,9 +100,10 @@ class TournamentValidator:
         return True
     
     def clean_and_validate_phone_number(self, phone_number):
-        print(f'validating {phone_number}')
+        if not phone_number.strip():
+            self.errors.append('Enter a number.')
+            return False
         try:
-            
             self.data['phone_number'] = int(phone_number)
         except ValueError:
             self.errors.append('Invalid number')
@@ -110,7 +117,9 @@ class TournamentValidator:
     
 
     def clean_and_validate_venue(self, venue):
-        print(f'validating {venue}')
+        if not venue.strip():
+            self.errors.append('Enter a venue address.')
+            return False
         self.data['venue'] = venue.strip()
         if len(venue) > 1024:
             self.errors.append('Venue name too long. Max 1024 characters.')
@@ -118,7 +127,6 @@ class TournamentValidator:
         return True
 
     def clean_and_validate_venue_link(self, venue_link):
-        print(f'validating {venue_link}')
         google_maps_regex = r'^https?:\/\/(?:www\.|maps\.app\.)?(?:google\.com\/maps\/|goo\.gl\/)\S*$'
         if not re.match(google_maps_regex, venue_link):
             self.errors.append('Invalid Google Maps link')
@@ -201,6 +209,9 @@ class CategoryValidator:
         self.all_categories= [category.catagory_type for category in self.tournament_instance.categories.all()]
         
     def clean_and_validate_category_type(self, category_type):
+        if not category_type.strip():
+            self.errors.append('Enter a category type.')
+            return False
         self.data['category_type'] = category_type.strip().upper().replace(" ", "_")
         if self.data['category_type'] in self.all_categories:
             self.errors.append('Category already exists.')
@@ -219,6 +230,9 @@ class CategoryValidator:
         return True
     
     def clean_and_validate_max_age(self, max_age):
+        if not max_age.strip():
+            self.errors.append('Enter a age.')
+            return False
         try:
             self.data['max_age'] = int(max_age)
         except ValueError:
@@ -227,6 +241,9 @@ class CategoryValidator:
         return True
     
     def clean_and_validate_price(self, price):
+        if not price.strip():
+            self.errors.append('Set a price.')
+            return False
         try:
             self.data['price'] = int(price)
         except ValueError:
@@ -259,6 +276,10 @@ class CategoryValidator:
         category.save()
         self.tournament_instance.categories.add(category)
         self.tournament_instance.save()
+        
+        if self.data.get('more_category'):
+            messages.add_message(self.req, messages.INFO, f'Category {self.data.get('category_type')} created successfully')
+            return False
         return category
     
     

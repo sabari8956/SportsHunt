@@ -7,7 +7,29 @@
 {% block body %}
 
 
+
+
 <div class="dark p-8">
+
+    <div class="flex" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+          <li class="inline-flex items-center">
+            <a href="{% url 'organisers:tournament' tournament_data.name %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+              {{ tournament_data.name }}
+            </a>
+          </li>
+    
+          <li aria-current="page">
+            <div class="flex items-center">
+              <svg class="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">{{category_data.catagory_type}}</span>
+            </div>
+          </li>
+        </ol>
+    </div>
+    <br>
     <div class="flex">
 
         <div class="w-1/2">
@@ -40,7 +62,7 @@
 
                 </address>
                 <div class="py-4">
-                    <h2>Count Down</h2>
+                    <h2 class="text-white font-semibold">Count Down</h2>
                     <div id="countdown-container"
                         class="max-w-[150px] mx-auto grid grid-cols-3 gap-2 text-center font-sans"></div>
                 </div>
@@ -61,8 +83,10 @@
                                     }
                                 }).then(response => response.json()).then(data => {
                                     console.log(data);
+                                    window.location.reload();
                                 }).catch((error) => {
                                     console.error('Error:', error);
+                                    alert('Error:', error);
                                 })
                             });
                         </script>
@@ -192,6 +216,23 @@
                             </div>
                         </div>
                     </div>
+                    <script>
+                        document.getElementById('close-reg-btn').addEventListener('click', function () {
+                            console.log('close registration');
+                            fetch("{% url 'api:close_registration' category_data.tournament  category_data.catagory_type %}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': '{{ csrf_token }}'
+                                }
+                            }).then(response => response.json()).then(data => {
+                                console.log(data);
+                                window.location.reload();
+                            }).catch((error) => {
+                                console.error('Error:', error);
+                            })
+                        });
+                    </script>
                     {% endif %}
 
                 </div>
@@ -200,11 +241,14 @@
         </div>
 
         <div class="w-1/2 flex flex-col items-center p-8">
+            {% if poster_url %}
+            <img width="400px" class="rounded-lg" src="{{poster_url}}" alt="placeholder">
+            {% else %}
             <img width="400px" src="https://picsum.photos/seed/picsum/400/500" alt="placeholder">
+            {% endif %}
         </div>
     </div>
 
-    {% if category_data.registration %}
     <div class="w-3/4">
         <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
             <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab"
@@ -238,50 +282,60 @@
                 <li class="flex items-center">
                     <svg class="w-3.5 h-3.5 me-2 text-gray-500 dark:text-gray-400 flex-shrink-0" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path
+                        <path fill-rule="evenodd" border="green" stroke="green" fill="white"
                             d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
                     </svg>
-                    {% for player in team %}
-                    {{ player }}
-                    {% endfor %}
+                    <span class="text-white">
+                        {{ team }}
+                    </span>
                 </li>
                 {% endfor %}
             </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-settings" role="tabpanel"
                 aria-labelledby="settings-tab">
-
-                {% include "components\macros\knockout_diagram.html" %}
+                {% if not category_data.registration %}
+                    Close Registration to create fixture
+                {% else %}
+                    {% if category_data.fixture %}
+                        {% include "components\macros\knockout_diagram.html" %}
+                    {% else%}
+                    {% endif %}
+                {% endif %}
             </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-dashboard" role="tabpanel"
                 aria-labelledby="dashboard-tab">
 
-                {% for match in upcoming_matches %}
+                {% if not category_data.registration %}
+                    close registration and crete fixture and schedule matches
+                {% else %}
+                    {% if not category_data.fixture %}
 
-                <div class="">
-                    {{match.team1.members}} vs {{match.team2.members}} <br>
-                </div>
-                {% endfor %}
+                    Create fixture to schedule matches
+                    {% else %}
+                        needs upgrade
+                        {% for match in upcoming_matches %}
+        
+                        <div class="">
+                            {{match.team1.members}} vs {{match.team2.members}} <br>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+
             </div>
 
         </div>
     </div>
-    {% endif %}
-
 
     <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/tabs.js"></script>
     <script>
-        // Set the date and time you want to count down to
-        const countDownDate = new Date("Jun 26, 2024 18:00:00").getTime();
+        const countDownDate = new Date("{{tournament_data.start_date}}").getTime();
 
-        // Update the count down every 1 second
         const x = setInterval(function () {
-            // Get today's date and time
             const now = new Date().getTime();
 
-            // Find the distance between now and the count down date
             const distance = countDownDate - now;
 
-            // Time calculations for days, hours, minutes, and seconds
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));

@@ -7,7 +7,7 @@ from api.serializer import *
 from django.db import IntegrityError
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.contrib.auth.decorators import login_required
 from organisers.forms import *
 from .utils import *
@@ -17,6 +17,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 def index(req):
+    if req.user.is_authenticated:
+        user = User.objects.get(username=req.user)
+        if not user.verified:
+            return redirect("core:verifyMail")
     messages = req._messages
     now = timezone.now()
     now_date = now.date()
@@ -40,6 +44,7 @@ def login_view(req):
 
         if user is not None:
             login(req, user)
+            messages.add_message(req, messages.SUCCESS, 'Logged in successfully')
             if user.is_organiser:
                 return HttpResponseRedirect(reverse("organisers:index"))
             return HttpResponseRedirect(reverse("core:index"))
@@ -49,7 +54,9 @@ def login_view(req):
     return render(req, "auth/login.html", {})
 
 def logout_view(req):
+    req.session.flush()
     logout(req)
+    messages.add_message(req, messages.INFO, 'Logged out successfully')
     return HttpResponseRedirect(reverse("core:index"))
 
 def register_view(req):
@@ -85,7 +92,7 @@ def verifyMail_view(req):
             return HttpResponseRedirect(reverse("core:index"))
         
         messages.add_message(req, messages.ERROR, 'Invalid OTP or OTP Expired')
-        return render(req, "auth/verifyMail.html") 
+        return render(req, "core/otp_verification.html") 
     
     print(user_instance.otpTime)
     if not user_instance.otpTime or user_instance.otpTime < timezone.now() - timezone.timedelta(minutes=5):
@@ -94,7 +101,7 @@ def verifyMail_view(req):
         else:
             messages.add_message(req, messages.ERROR, 'Error sending OTP')            
 
-    return render(req, "auth/verifyMail.html")
+    return render(req, "core/otp_verification.html")
 
 
 def organisation_view(req, org_name):
@@ -114,10 +121,23 @@ def tournament_view(req, tournament_name):
             "tournament_name": tournament_name, 
         })
     tournament = Tournament.objects.get(name=tournament_name)
-    serializer = OrgTournamentSerializer(tournament, many=False)
-    print(serializer.data)
+    serializer = OrgTournamentSerializer(tournament, many=False).data
+    serializer['status'] = True
+    end_date_dt = datetime.strptime(serializer['end_date'], "%Y-%m-%d")
+    end_date_dt = timezone.make_aware(end_date_dt, timezone.get_current_timezone())
+
+    if end_date_dt < timezone.now():
+        serializer['status'] = False
+
+    start_date_dt = datetime.strptime(serializer['start_date'], "%Y-%m-%d")
+    start_date_dt = timezone.make_aware(start_date_dt, timezone.get_current_timezone())
+    start_date_dt = start_date_dt.strftime("%b %d, %Y %H:%M:%S")
+    serializer['timer'] = start_date_dt
+    
+    poster_url = tournament.get_poster()
     return render(req, "core/tournament.html", {
-        "tournament_data": serializer.data,  
+        "tournament_data": serializer,  
+        "poster_url": poster_url,
     })
     
 # have to create a category view
@@ -142,12 +162,14 @@ def category_view(req, tournament_name, category_name):
         }
         stage = stages_dict.get(int(fixture_data["currentStage"]), None)
     
+    poster_url = tournament_instance.get_poster()
     return render(req, "core/category.html", {
         "category_data": data,
         "tournament_data": tournament_instance,
         "fixture_id": fixture_data['id'] if fixture_data else None,
         "teams": teams,
         "upcoming_matches": upcoming_matches,
+        "poster_url": poster_url,
         "stage": stage,
     })
 
@@ -161,6 +183,7 @@ def cart_view(req):
         item_dict = {}
         item_dict["members"] = [f'{player.name}' for player in item.members.all()]
         item_dict["category"] = item.category
+
         if not item.category.registration:
             cart_data.append(item_dict)
             total += item.category.price
@@ -219,3 +242,22 @@ def checkout(req):
     order_instance.status = 'failed'
     order_instance.save()
     return render(req, "payments/failed.html")
+
+@login_required(login_url="/login/")
+def order_view(req):
+    user = User.objects.get(username=req.user)
+    orders = user.orders.all()
+    print(orders)
+    # orders_data = []
+    # for order in orders:
+    #     order_dict = {}
+    #     order_dict["order_id"] = order.order_id
+    #     order_dict["amount"] = order.amount
+    #     order_dict["status"] = order.status
+    #     order_dict["created_at"] = order.created_at
+    #     order_dict["updated_at"] = order.updated_at
+    #     order_dict["cart_items"] = [team.category for team in order.cart_items.all()]
+    #     orders_data.append(order_dict)
+    return render(req, "core/orders.html", {
+        "orders": orders,
+    })

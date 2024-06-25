@@ -184,8 +184,8 @@ class OrgTournamentSerializer(serializers.ModelSerializer):
             data = super().to_representation(instance)
             return data['name']
     
-    start_date = FormattedDateField(read_only=True)
-    end_date = FormattedDateField(read_only=True, date_format='%d %b %y')
+    # start_date = FormattedDateField(read_only=True)
+    # end_date = FormattedDateField(read_only=True, date_format='%d %b %y')
     game = GameSerializer(read_only=True)
     categories = CategorySerializer(many=True, read_only=True)
     org = OrgSerializer(read_only=True)
@@ -205,6 +205,7 @@ class CategoryViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'catagory_type', 'details', 'price', 'fixture', 'teams', 'registration', 'winner']
+    
         depth = 1
 
 # Serializer for ongoing matches in a tournament
@@ -278,3 +279,36 @@ class orgSerlializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return dict(data)
+    
+
+class CategorySerializerAll(serializers.ModelSerializer):
+    class TeamSerializer(serializers.ModelSerializer):
+        members = PlayerSerializer(many=True, read_only=True)
+        class Meta:
+            model = Team
+            fields = ['id','members', 'payment_method']
+        
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            name = ''
+            l_mem = len(data['members'])
+            print(data['members'], l_mem)
+            for i, player in enumerate(data['members']):
+                if i == l_mem - 1:
+                    name += player
+                else:
+                    name += player + ', '
+            print(name, 'wdaw')
+            data['members'] = name
+            return dict(data)
+
+    teams = TeamSerializer(many=True, read_only=True)
+    class Meta:
+        model = Category
+        depth = 1
+        fields = ['catagory_type', 'price', 'teams', 'tournament']
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return dict(data)
+    

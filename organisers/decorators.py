@@ -69,7 +69,9 @@ def organiser_required(view_func):
         if not request.user.is_authenticated:
             messages.info(request, 'You Need to be logged in!')
             return redirect("core:login")
-        
+        if not request.user.verified:
+            messages.info(request, 'Verify Your Email!')
+            return redirect("core:verifyMail")
         if not request.user.is_organiser:
             messages.info(request, 'You Need to be an Organiser!')
             return redirect("core:index")

@@ -8,8 +8,12 @@ Tournament
 <div class="flex p-8">
 
     <div class="w-1/2">
-        <mark class="px-2 text-white bg-blue-600 rounded dark:bg-green-500">Registration: open</mark>
-        <mark class="px-2 text-white bg-blue-600 rounded dark:bg-blue-500">Tennis</mark>
+        {% if tournament_data.status %}
+        <mark class="px-2 text-white bg-blue-600 rounded dark:{{tournament_data.status_color}}">{{tournament_data.status}}</mark>
+        {% else %}
+        <mark class="px-2 text-white bg-red-600 rounded dark:bg-red-500">Completed</mark>
+        {% endif %}
+        <mark class="px-2 text-white bg-blue-600 rounded dark:bg-blue-500">{{tournament_data.game}}</mark>
 
 
         <h1
@@ -39,7 +43,13 @@ Tournament
 
 
             <div class="pt-4">
-                <h1 class="text-2xl dark:text-white">Categories </h1> <a href="{% url 'organisers:create_categories' tournament_data.name %}">New Category</a> <br>
+                <div class="flex items-center justify-between my-4">
+                    <h1 class="text-2xl dark:text-white">Categories</h1>
+                    <a href="{% url 'organisers:create_categories' tournament_data.name %}"
+                        class="ml-4 px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+                        New Category
+                    </a>
+                </div>
                 <ul class="max-w-md px-2 divide-y divide-gray-200 dark:divide-gray-700">
                     {% for category in tournament_data.categories %}
 
@@ -58,11 +68,15 @@ Tournament
                             </div>
                             <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
                                 {% if category.registration %}
-                                <mark class="px-2 text-white bg-blue-600 rounded dark:bg-red-500 mx-4 ">Registration:
-                                    Closed</mark>
+                                <span class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
+                                    <span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span>
+                                    closed
+                                </span>
                                 {% else %}
-                                <mark class="px-2 text-white bg-blue-600 rounded dark:bg-green-500">Registration:
-                                    open</mark>
+                                <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                    <span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span>
+                                    open
+                                </span>
                                 {% endif %}
                                 ₹{{ category.price }}
                             </div>
@@ -99,8 +113,11 @@ Tournament
 
 
     <div class="w-1/2 flex flex-col items-center ">
-        <img style="border-radius: 15px;" width="400px" src="https://picsum.photos/seed/picsum/400/500"
-            alt="placeholder">
+        {% if tournament_poster_url %}
+        <img style="border-radius: 15px;" width="400px" src="{{ tournament_poster_url}}" alt="tournament poster">
+        {% else %}
+        <img style="border-radius: 15px;" width="400px" src="https://picsum.photos/seed/picsum/400/500" alt="placeholder">
+        {% endif %}
         <div class="py-4">
             <div id="countdown-container" class="max-w-[150px] mx-auto grid grid-cols-3 gap-2 text-center font-sans">
             </div>
@@ -129,7 +146,7 @@ Tournament
                     </svg>
                     <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Close registration for all
                         category..?</h3>
-                    <button type="button" onclick="console.log('close registrationdwadawdaw')" id="close-reg-btn"
+                    <button type="button" id="close-reg-btn"
                         data-modal-hide="close-reg"
                         class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
                         Yes, I'm sure
@@ -181,7 +198,8 @@ Tournament
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <option selected disabled>Select category</option>
                                 {% for category in tournament_data.categories %}
-                                <option value="{{category.id}}" data-price="{{category.price}}">{{category.catagory_type}}</option>
+                                <option value="{{category.id}}" data-price="{{category.price}}">
+                                    {{category.catagory_type}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -213,7 +231,7 @@ Tournament
 
     <script>
         // Set the date and time you want to count down to
-        const countDownDate = new Date("Jun 26, 2024 18:00:00").getTime();
+        const countDownDate = new Date("{{tournament_data.timer}}").getTime();
 
         // Update the count down every 1 second
         const x = setInterval(function () {
@@ -304,6 +322,7 @@ Tournament
                 .then(data => {
                     // console.log(data);
                     document.getElementById('name').textContent = '';
+                    window.location.reload();
                     // document.getElementById('close_modal').click();
                 })
                 .catch(error => {

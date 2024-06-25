@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "organisers/base.html" %}
 
 {% block title %}
 Create Category
@@ -13,7 +13,7 @@ Create Category
                 <li
                     class="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 dark:text-primary-500 dark:after:border-gray-700 sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
                     <span
-                        class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden">
+                        class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden text-green-500">
                         <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -26,7 +26,7 @@ Create Category
                 <li
                     class="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200  dark:after:border-gray-700 sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
                     <span
-                        class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden">
+                        class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden text-yellow-500">
                         <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -59,16 +59,9 @@ Create Category
                                     Type</label>
                                 <input type="text" id="catgorytype" name="category_type"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    placeholder="standard" required />
+                                    placeholder="eg. U18BS" required />
                             </div>
 
-                            <!-- <div class="mb-5">
-                                <label for="text"
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Details</label>
-                                <input type="text" id="details" name="details"
-                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                    required />
-                            </div> -->
                             <div class="mb-5">
                                 <label for="price"
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Participation
@@ -125,7 +118,7 @@ Create Category
                                         <div class="inline-flex items-center">
                                             <label class="relative flex items-center p-3 rounded-full cursor-pointer"
                                                 htmlFor="custom-style2">
-                                                <input name="fixture_type" type="radio" value="roundrobin"
+                                                <input name="fixture_type" type="radio" value="roundrobin" disabled
                                                     class="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-full border border-gray-300 bg-gray-700 p-0 text-gray-300 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-gray-500 before:opacity-0 before:transition-opacity checked:border-gray-300 checked:before:bg-gray-300 hover:before:opacity-0"
                                                     id="custom-style2" />
                                                 <span
@@ -141,7 +134,7 @@ Create Category
                                             <label class="mt-px font-light text-gray-300 cursor-pointer select-none"
                                                 htmlFor="custom-style2">
                                                 <p
-                                                    class="block font-sans text-base antialiased font-normal leading-relaxed text-gray-300">
+                                                    class="block font-sans text-base antialiased font-normal leading-relaxed text-gray-600">
                                                     Round Robin
                                                 </p>
                                             </label>
@@ -168,7 +161,7 @@ Create Category
             </div>
 
             <div>
-                <button type="button" data-ripple-light="true"
+                <button type="button" data-ripple-light="true" id="save-and-create-another"
                     class="mt-6 align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg bg-blue-600 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none">
                     Save & create another
                 </button>
@@ -180,4 +173,17 @@ Create Category
             </div>
         </form>
     </section>
+
+    <script>
+        const saveAndCreateAnother = document.getElementById('save-and-create-another');
+        saveAndCreateAnother.addEventListener('click', () => {
+            // add data to form and submit
+            var more_category = document.createElement('input');
+            more_category.setAttribute('type', 'hidden');
+            more_category.setAttribute('name', 'more_category');
+            more_category.setAttribute('value', 'true');
+            document.querySelector('form').appendChild(more_category);
+            document.querySelector('form').submit();
+        });
+    </script>
 {% endblock body %}

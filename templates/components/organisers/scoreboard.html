@@ -1,4 +1,4 @@
-<div class="dark">
+<div class="dark p-8 ">
     <!-- Landscape Alert for Small Screens -->
     <div class="landscape-alert hidden text-center bg-yellow-400 text-gray-800 p-4 rounded">
         Please rotate your device to landscape mode for the best experience.
@@ -6,12 +6,12 @@
 
     <!-- Main Content -->
     <div class="content flex flex-col items-center justify-center space-y-8">
-        <h1 class="text-3xl font-bold mb-6 text-center">ScoreBoard</h1>
+        <h1 class="text-3xl font-bold mb-6 text-center text-white">ScoreBoard</h1>
         <div class="flex flex-col md:flex-row md:space-x-8 space-y-8 md:space-y-0">
             <!-- Counter 1 -->
-            <div class="bg-gray-800 p-8 rounded shadow-lg text-center">
-                <h1 class="text-2xl font-bold mb-4">Team 1</h1>
-                <div id="counter1" class="text-4xl font-semibold mb-4">{{match_data.current_set.team1_score}}</div>
+            <div class="bg-gray-900 p-8 rounded shadow-lg text-center">
+                <h1 class="text-2xl font-bold mb-4 text-white">{{match_data.team1.members}}</h1>
+                <div id="counter1" class="text-4xl font-semibold mb-4 text-white">{{match_data.current_set.team1_score}}</div>
                 <div class="flex justify-center space-x-4">
                     <button id="decrease1"
                         class="border border-white text-white bg-gray-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Decrease</button>
@@ -21,9 +21,9 @@
             </div>
 
             <!-- Counter 2 -->
-            <div class="bg-gray-800 p-8 rounded shadow-lg text-center">
-                <h1 class="text-2xl font-bold mb-4">Team 2</h1>
-                <div id="counter2" class="text-4xl font-semibold mb-4">{{ match_data.current_set.team2_score}}</div>
+            <div class="bg-gray-900 p-8 rounded shadow-lg text-center">
+                <h1 class="text-2xl font-bold mb-4 text-white">{{match_data.team2.members}}</h1>
+                <div id="counter2" class="text-4xl font-semibold mb-4 text-white">{{ match_data.current_set.team2_score}}</div>
                 <div class="flex justify-center space-x-4">
                     <button id="decrease2"
                         class="border border-white text-white bg-gray-700 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Decrease</button>
@@ -35,7 +35,7 @@
 
         <!-- Declare Winner Button -->
         <button type="button" id="declare_winner"
-            class="text-white bg-gray-800 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Declare
+            class="text-white bg-gray-900 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-gray-900 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Declare
             Winner</button>
     </div>
     <script>

@@ -2,6 +2,9 @@ from django.db import models
 from core.models import User
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
+from azure.storage.blob import generate_blob_sas, BlobSasPermissions
+from datetime import datetime, timedelta
+from django.conf import settings
 
 # Create your models here.
 class Organisation(models.Model):
@@ -23,6 +26,9 @@ class Organisation(models.Model):
         return f"{self.name}"
     
 class Tournament(models.Model):
+    def upload_to(instance, filename):
+        return f"tournament_posters/{instance.org.name}/{instance.name}"
+    
     name = models.CharField('tournament name', max_length=254, unique=True)
     org = models.ForeignKey(Organisation, on_delete=models.CASCADE)
     mods = models.ManyToManyField(User, related_name='tournament_mod', blank= True)
@@ -33,6 +39,8 @@ class Tournament(models.Model):
     venue = models.CharField('Venue', max_length=1024, default="TBA")
     venue_link = models.URLField('Venue Link', max_length=1024, blank= True, null= True)
     onGoing_matches = models.ManyToManyField('Match', related_name='tournament_on_going_matches', blank= True)
+    poster = models.ImageField('poster', upload_to= upload_to, blank= True, null= True)
+    
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(" ", "_")
         if self.pk:
@@ -42,6 +50,21 @@ class Tournament(models.Model):
             if Tournament.objects.filter(name=self.name).exists():
                 raise ValidationError("Tournament name already exists.")
         super().save(*args, **kwargs)
+    
+    def get_poster(self):
+        if not self.poster:
+            return None
+        sas_token = generate_blob_sas(
+            account_name=settings.AZURE_ACCOUNT_NAME,
+            container_name=settings.AZURE_CONTAINER,
+            blob_name=self.poster.name,
+            account_key=settings.AZURE_ACCOUNT_KEY,
+            permission=BlobSasPermissions(read=True),
+            expiry=datetime.now() + timedelta(seconds=30)  # Adjust the expiry as needed
+        )
+        
+        base_url = f'https://{settings.AZURE_ACCOUNT_NAME}.blob.core.windows.net/{settings.AZURE_CONTAINER}/{self.poster.name}?{sas_token}'
+        return base_url
     
     def __str__(self) -> str:
         return f"{self.name}"
@@ -73,6 +96,7 @@ class Team(models.Model):
     members = models.ManyToManyField(Player, related_name='team_members', blank= True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     payment_method = models.BooleanField(default=True)
+    # payment_id = models.CharField('payment id', max_length=254, blank= True, null= True)  
     def save(self, *args, **kwargs):
         # if len(self.members.all()) > self.category.team_size:
         #     raise ValidationError("Team size exceeded.")

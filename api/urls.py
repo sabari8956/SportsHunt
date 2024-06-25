@@ -7,6 +7,7 @@ urlpatterns = [
     path('offline_register/', register_player, name="offline_register"),
     path('declare_winner/', declare_match_winner, name='declare_winner'),
     path('schedule_match/', schedule_match, name="schedule_match"),
+    path('edit_mail/', edit_mail, name="edit_mail"),
     path('increment_score/<int:match_id>/<int:team_id>/', increment_score, name='increment_score'),
     path('decrement_score/<int:match_id>/<int:team_id>/', decrement_score, name='decrement_score'),
     path('get_fixture_json/<int:fixture_id>/', fixtureJSON, name='get_fixture_json'),

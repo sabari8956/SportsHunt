@@ -26,7 +26,16 @@ DATABASES = {
 
 # Static files conf
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
+
+# Azure Blob Storage settings
+AZURE_ACCOUNT_NAME = 'shtesting'
+AZURE_ACCOUNT_KEY = 'YX2XsOtWp3uTWV0Tn42PifpXkjJ3SCu6MOvFSiFBtOrZAnvckVVpdDG+QXns5U0HpyW4IKqedPTP+AStljdARw=='
+AZURE_CONTAINER = 'testing-data'
+
+# Use Azure Blob Storage for media files
+DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
 
 
 
