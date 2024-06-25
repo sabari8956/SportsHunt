@@ -93,7 +93,6 @@ def verifyMail_view(req):
         
         messages.add_message(req, messages.ERROR, 'Invalid OTP or OTP Expired')
         return render(req, "core/otp_verification.html") 
-    
     print(user_instance.otpTime)
     if not user_instance.otpTime or user_instance.otpTime < timezone.now() - timezone.timedelta(minutes=5):
         if sendOTP(user_instance):
@@ -183,8 +182,7 @@ def cart_view(req):
         item_dict = {}
         item_dict["members"] = [f'{player.name}' for player in item.members.all()]
         item_dict["category"] = item.category
-
-        if not item.category.registration:
+        if not item.category.registered:
             cart_data.append(item_dict)
             total += item.category.price
         else:

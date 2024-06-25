@@ -184,8 +184,7 @@ class OrgTournamentSerializer(serializers.ModelSerializer):
             data = super().to_representation(instance)
             return data['name']
     
-    # start_date = FormattedDateField(read_only=True)
-    # end_date = FormattedDateField(read_only=True, date_format='%d %b %y')
+
     game = GameSerializer(read_only=True)
     categories = CategorySerializer(many=True, read_only=True)
     org = OrgSerializer(read_only=True)
@@ -205,7 +204,6 @@ class CategoryViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'catagory_type', 'details', 'price', 'fixture', 'teams', 'registration', 'winner']
-    
         depth = 1
 
 # Serializer for ongoing matches in a tournament

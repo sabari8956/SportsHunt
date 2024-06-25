@@ -25,7 +25,6 @@ def add_to_cart(req):
     if not name:
         return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
     players_instances = Player.objects.create(name=name)
-
     name_fields = [value for key, value in data.lists() if key.startswith('name_')]
     players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
 
