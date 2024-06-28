@@ -18,12 +18,12 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
-    'widget_tweaks',
+    # 'widget_tweaks',
 ]
 
 APPS = [
