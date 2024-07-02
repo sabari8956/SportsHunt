@@ -5,54 +5,6 @@ Tournament
 {% endblock title %}
 
 {% block body %}
-<!-- 
-<div>
-    <h1
-        class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-        {{ tournament_data.name }}, <small class="ms-2 font-semibold text-gray-500 dark:text-gray-400"> by {{ tournament_data.org }}</small></h1>
-    <span
-        class="bg-blue-100 text-blue-800 text-2xl font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800 ms-2">{{ tournament_data.game }}</span>
-</div>
-
-
-{% include "components\macros\tournament_details_card.html" %}
-<div
-    class="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-    <div class="flex items-center justify-between mb-4">
-        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Categories</h5>
-    </div>
-    {% for category in tournament_data.categories %}
-        <div class="flow-root">
-            <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                <li class="py-3 sm:py-4">
-                    <div class="flex items-center">
-                        <div class="flex-1 min-w-0 ms-4">
-                            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                    {{ category.catagory_type }}
-                            </p>
-                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                {{ category.details }}
-                            </p>
-                        </div>
-                        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                            ₹{{ category.price }}
-                        </div>  
-                    </div>
-                </li>
-            </ul>
-        </div>
-    {% empty %}
-    check later!
-    {% endfor %}
-
-    
-</div> 
-
-
-
- include "components\organisers\add_to_cart.html" %} -->
-
-
 
 <div class="flex p-8">
 
@@ -126,78 +78,86 @@ Tournament
                 </ul>
             </div>
             <div class="pt-4">
+                {% if user.is_authenticated %}
+                  
                 <button data-modal-target="registration" data-modal-toggle="registration"
                 class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 type="button">
                 Register
-            </button>
-            <div id="registration" tabindex="-1" aria-hidden="true"
-                class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                <div class="relative p-4 w-full max-w-md max-h-full">
-                    <!-- Modal content -->
-                    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <!-- Modal header -->
-                        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                Register
-                            </h3>
-                            <button id="close_modal" type="button"
-                                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                data-modal-toggle="registration">
-                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 14 14">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                </svg>
-                                <span class="sr-only">Close modal</span>
-                            </button>
-                        </div>
-
-                        <form id="cart-form" class="p-4 md:p-5" action="" method="POST">
-                            {% csrf_token %}
-                            <div class="grid gap-4 mb-4 grid-cols-2">
-                                <div id="name_input" class="col-span-2">
-                                    <label for="name"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                                    <input name="name" id="name"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder="Joey" required="">
-                                </div>
-                                <div class="col-span-2 sm:col-span-1">
-                                    <label for="category"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-                                    <select name="category" onchange="updatePrice()" id="category" required
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                        <option selected disabled>Select category</option>
-                                        {% for category in tournament_data.categories %}
-                                        <option value="{{category.id}}" data-price="{{category.price}}">
-                                            {{category.catagory_type}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-span-2 sm:col-span-1">
-                                    <label for="price"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
-                                    <input disabled value="0" name="price" name="price" id="price"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder="$2999" required="">
-                                </div>
+                </button>
+                <div id="registration" tabindex="-1" aria-hidden="true"
+                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                    <div class="relative p-4 w-full max-w-md max-h-full">
+                        <!-- Modal content -->
+                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                            <!-- Modal header -->
+                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Register
+                                </h3>
+                                <button id="close_modal" type="button"
+                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                                    data-modal-toggle="registration">
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
                             </div>
-
-                            <button type="submit"
-                                class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd"
-                                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                Add To Cart
-                            </button>
-                        </form>
+    
+                            <form id="cart-form" class="p-4 md:p-5" action="" method="POST">
+                                {% csrf_token %}
+                                <div class="grid gap-4 mb-4 grid-cols-2">
+                                    <div id="name_input" class="col-span-2">
+                                        <label for="name"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                                        <input name="name" id="name"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                            placeholder="Joey" required="">
+                                    </div>
+                                    <div class="col-span-2 sm:col-span-1">
+                                        <label for="category"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                                        <select name="category" onchange="updatePrice()" id="category" required
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                            <option selected disabled>Select category</option>
+                                            {% for category in tournament_data.categories %}
+                                            <option value="{{category.id}}" data-price="{{category.price}}">
+                                                {{category.catagory_type}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-span-2 sm:col-span-1">
+                                        <label for="price"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+                                        <input disabled value="0" name="price" name="price" id="price"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                            placeholder="$2999" required="">
+                                    </div>
+                                </div>
+    
+                                <button type="submit"
+                                    class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                    <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    Add To Cart
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+                {% else %}
+                <a href="{% url 'core:login' %}"
+                    class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Login to Register
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>

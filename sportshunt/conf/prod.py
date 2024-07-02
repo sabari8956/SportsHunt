@@ -4,24 +4,27 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-DEBUG = False if os.environ.get("DEBUG") == 'False' else True
+DEBUG = False
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(' ')
-print(ALLOWED_HOSTS)
+RAZOR_KEY_ID = os.environ.get("RAZOR_KEY_ID")
+RAZOR_KEY_SECRET = os.environ.get("RAZOR_KEY_SECRET")
+CSRF_TRUSTED_ORIGINS = ['https://api.razorpay.com', 'https://sportshunt.azurewebsites.net', 'https://sportshunt.in']
 
-# Database  [ dev will use sqlite3 / prod will be mysql ]
+
+
+WSGI_APPLICATION = 'sportshunt.wsgi_prod.application'
+ASGI_APPLICATION = 'sportshunt.asgi.prod.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.prod.sqlite3',
     }
 }
 
 # Static files conf
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
-
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -31,16 +34,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'media'),
 ]
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email'
-        ],
-        "AUTH_PARAMS": {"access_type": "online"}
-    }
-}
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -63,9 +56,16 @@ AZURE_ACCOUNT_NAME = os.environ.get("STORAGE_BUCKET_NAME")
 AZURE_ACCOUNT_KEY = os.environ.get("STORAGE_BUCKET_KEY")
 AZURE_CONTAINER = os.environ.get("STORAGE_BUCKET_CONTAINER")
 
-print(AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY, AZURE_CONTAINER)
 # Use Azure Blob Storage for media files
 DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
 AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
 MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
 
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+SECURE_HSTS_SECONDS = 31536000 
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

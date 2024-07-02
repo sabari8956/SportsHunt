@@ -3,6 +3,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+print(BASE_DIR)
 
 # Application definition
 
@@ -21,7 +22,7 @@ THIRD_PARTY_APPS = [
     # 'allauth',
     # 'allauth.account',
     # 'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.google',
     'rest_framework',
     # 'widget_tweaks',
 ]
@@ -58,7 +59,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request', #all-auth requirement
             ],
         },
     },
