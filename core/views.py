@@ -245,17 +245,9 @@ def checkout(req):
 def order_view(req):
     user = User.objects.get(username=req.user)
     orders = user.orders.all()
-    print(orders)
-    # orders_data = []
-    # for order in orders:
-    #     order_dict = {}
-    #     order_dict["order_id"] = order.order_id
-    #     order_dict["amount"] = order.amount
-    #     order_dict["status"] = order.status
-    #     order_dict["created_at"] = order.created_at
-    #     order_dict["updated_at"] = order.updated_at
-    #     order_dict["cart_items"] = [team.category for team in order.cart_items.all()]
-    #     orders_data.append(order_dict)
     return render(req, "core/orders.html", {
         "orders": orders,
     })
+    
+def policy_view(req):
+    return render(req, "core/policy.html")
