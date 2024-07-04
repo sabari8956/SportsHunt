@@ -15,8 +15,6 @@ CSRF_TRUSTED_ORIGINS = ['https://api.razorpay.com']
 
 
 
-# Database  [ dev will use sqlite3 / prod will be mysql ]
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -24,13 +22,16 @@ DATABASES = {
     }
 }
 
+WSGI_APPLICATION = 'sportshunt.wsgi.application'
+ASGI_APPLICATION = 'sportshunt.asgi.application'
+
 # Static files conf
 STATIC_URL = 'static/'
 
 # Azure Blob Storage settings
-AZURE_ACCOUNT_NAME = 'shtesting'
-AZURE_ACCOUNT_KEY = 'YX2XsOtWp3uTWV0Tn42PifpXkjJ3SCu6MOvFSiFBtOrZAnvckVVpdDG+QXns5U0HpyW4IKqedPTP+AStljdARw=='
-AZURE_CONTAINER = 'testing-data'
+AZURE_ACCOUNT_NAME = os.environ.get("STORAGE_BUCKET_NAME")
+AZURE_ACCOUNT_KEY = os.environ.get("STORAGE_BUCKET_KEY")
+AZURE_CONTAINER = os.environ.get("STORAGE_BUCKET_CONTAINER")
 
 # Use Azure Blob Storage for media files
 DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
@@ -47,15 +48,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'media'),
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email'
-        ],
-        "AUTH_PARAMS": {"access_type": "online"}
-    }
-}
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -65,5 +57,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.hostinger.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'otp@sportshunt.in'
-EMAIL_HOST_PASSWORD = 'SportsHunt@23'
+EMAIL_HOST_USER = os.environ.get("OTP_MAIL_ADDRESS")
+EMAIL_HOST_PASSWORD = os.environ.get("OTP_MAIL_PASSWORD")

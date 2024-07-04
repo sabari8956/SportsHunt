@@ -1,3 +1,36 @@
 {
-    "liveServer.settings.port": 5501
+    "liveServer.settings.port": 5501,
+    "appService.zipIgnorePattern": [
+        "__pycache__{,/**}",
+        "*.py[cod]",
+        "*$py.class",
+        ".Python{,/**}",
+        "build{,/**}",
+        "develop-eggs{,/**}",
+        "dist{,/**}",
+        "downloads{,/**}",
+        "eggs{,/**}",
+        ".eggs{,/**}",
+        "lib{,/**}",
+        "lib64{,/**}",
+        "parts{,/**}",
+        "sdist{,/**}",
+        "var{,/**}",
+        "wheels{,/**}",
+        "share/python-wheels{,/**}",
+        "*.egg-info{,/**}",
+        ".installed.cfg",
+        "*.egg",
+        "MANIFEST",
+        ".env{,/**}",
+        ".venv{,/**}",
+        "env{,/**}",
+        "venv{,/**}",
+        "ENV{,/**}",
+        "env.bak{,/**}",
+        "venv.bak{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/a3e2aa81-6c58-42ff-a34d-39924ab8e0c1/resourceGroups/sportshunt-prod/providers/Microsoft.Web/sites/sportshunt",
+    "appService.deploySubpath": "."
 }
