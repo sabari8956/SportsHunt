@@ -5,223 +5,194 @@ Tournament
 {% endblock title %}
 
 {% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="w-full lg:w-1/2 lg:order-1">
+        <div class="flex flex-wrap gap-2 mb-4">
+            {% if tournament_data.status %}
+            <span class="px-2 py-1 text-sm text-white bg-blue-600 rounded">open</span>
+            {% else %}
+            <span class="px-2 py-1 text-sm text-white bg-red-600 rounded">Completed</span>
+            {% endif %}
+            <span class="px-2 py-1 text-sm text-white bg-blue-600 rounded">Tennis</span>
+        </div>
 
-<div class="flex p-8">
+        <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
+            {{tournament_data.name}} 
+            <small class="block mt-2 text-xl font-semibold text-gray-500 dark:text-gray-400">by {{tournament_data.org}}</small>
+        </h1>
 
-    <div class="w-1/2">
-        {% if tournament_data.status %}
-        <mark class="px-2 text-white bg-blue-600 rounded dark:bg-green-500">open</mark>
-        {% else %}
-        <mark class="px-2 text-white bg-red-600 rounded dark:bg-red-500">Completed</mark>
-        {% endif %}
+    </div>
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Image Section - Displayed first on mobile -->
+        <div class="w-full lg:w-1/2 lg:order-2 mb-8 lg:mb-0">
+            {% if poster_url %}
+            <img class="rounded-lg shadow-lg w-full max-w-md mx-auto mb-8" src="{{poster_url}}" alt="tournament_poster">
+            {% else %}
+            <img class="rounded-lg shadow-lg w-full max-w-md mx-auto mb-8" src="https://picsum.photos/seed/picsum/400/500" alt="placeholder">
+            {% endif %}
 
-        <mark class="px-2 text-white bg-blue-600 rounded dark:bg-blue-500">Tennis</mark>
-
-
-        <h1
-            class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-            {{tournament_data.name}} <small class="ms-2 font-semibold text-gray-500 dark:text-gray-400">by
-                {{tournament_data.org}}</small> </h1>
-
-
-
-        <div
-            class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Details</h2>
-            <address
-                class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-2">
-                <div class="space-y-2 text-gray-500 dark:text-gray-400 leading-loose sm:block">
-                    Organisers <br>
-                    Date <br>
-                    Venue
-                </div>
-
-                <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
-                    <a href="#"> {{tournament_data.org}}</a> <br>
-                    {{tournament_data.start_date}} to {{tournament_data.end_date}}<br />
-                    {{tournament_data.venue}}
-                </div>
-            </address>
-
-
-            <div class="pt-4">
-                <h1 class="text-2xl dark:text-white">Categories </h1> <br>
-                <ul class="max-w-md px-2 divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for category in tournament_data.categories %}
-
-                    <li class="pb-3 sm:pb-4">
-                        <a href="{% url 'core:category' tournament_data.name category.catagory_type %}" class="flex items-center space-x-4 rtl:space-x-reverse">
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                    {{ category.catagory_type }}
-                                </p>
-                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                    {{ category.details }}
-                                </p>
-                            </div>
-                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                ₹{{ category.price }}
-                            </div>
-                            <svg width="100px" height="100px" class="h-10 w-10 text-gray-500 dark:text-gray-400"
-                                viewBox="0 0 24 24" fill="#000000" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M15.0001 13.5V9M15.0001 9H10.5001M15.0001 9L9.00024 14.9999M7.20024 20H16.8002C17.9203 20 18.4804 20 18.9082 19.782C19.2845 19.5903 19.5905 19.2843 19.7823 18.908C20.0002 18.4802 20.0002 17.9201 20.0002 16.8V7.2C20.0002 6.0799 20.0002 5.51984 19.7823 5.09202C19.5905 4.71569 19.2845 4.40973 18.9082 4.21799C18.4804 4 17.9203 4 16.8002 4H7.20024C6.08014 4 5.52009 4 5.09226 4.21799C4.71594 4.40973 4.40998 4.71569 4.21823 5.09202C4.00024 5.51984 4.00024 6.07989 4.00024 7.2V16.8C4.00024 17.9201 4.00024 18.4802 4.21823 18.908C4.40998 19.2843 4.71594 19.5903 5.09226 19.782C5.52009 20 6.08014 20 7.20024 20Z"
-                                    stroke="currentColor" stroke-width="1" stroke-linecap="round"
-                                    stroke-linejoin="round" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </li>
-                    {% empty %}
-                    check later!
-                    {% endfor %}
-                </ul>
+            {% if tournament_data.status %}
+              
+            <div class="w-full max-w-md mx-auto">
+                <h3 class="text-xl font-semibold text-center mb-4 text-gray-900 dark:text-white">Tournament Starts In</h3>
+                <div id="countdown-container" class="grid grid-cols-3 gap-4 text-center"></div>
             </div>
-            <div class="pt-4">
-                {% if user.is_authenticated %}
-                  
-                <button data-modal-target="registration" data-modal-toggle="registration"
-                class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                type="button">
-                Register
-                </button>
-                <div id="registration" tabindex="-1" aria-hidden="true"
-                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-md max-h-full">
-                        <!-- Modal content -->
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <!-- Modal header -->
-                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Register
-                                </h3>
-                                <button id="close_modal" type="button"
-                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                    data-modal-toggle="registration">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                    </svg>
-                                    <span class="sr-only">Close modal</span>
-                                </button>
-                            </div>
-    
-                            <form id="cart-form" class="p-4 md:p-5" action="" method="POST">
-                                {% csrf_token %}
-                                <div class="grid gap-4 mb-4 grid-cols-2">
-                                    <div id="name_input" class="col-span-2">
-                                        <label for="name"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                                        <input name="name" id="name"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                            placeholder="Joey" required="">
-                                    </div>
-                                    <div class="col-span-2 sm:col-span-1">
-                                        <label for="category"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
-                                        <select name="category" onchange="updatePrice()" id="category" required
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                                            <option selected disabled>Select category</option>
-                                            {% for category in tournament_data.categories %}
-                                            <option value="{{category.id}}" data-price="{{category.price}}">
-                                                {{category.catagory_type}}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-span-2 sm:col-span-1">
-                                        <label for="price"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
-                                        <input disabled value="0" name="price" name="price" id="price"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                            placeholder="$2999" required="">
-                                    </div>
-                                </div>
-    
-                                <button type="submit"
-                                    class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                    <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd"
-                                            d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                            clip-rule="evenodd"></path>
-                                    </svg>
-                                    Add To Cart
-                                </button>
-                            </form>
+
+            <script>
+                // Countdown timer script
+                const countDownDate = new Date("{{ tournament_data.timer }}").getTime();
+            
+                const x = setInterval(function () {
+                    const now = new Date().getTime();
+                    const distance = countDownDate - now;
+            
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            
+                    const countdownContainer = document.getElementById("countdown-container");
+                    countdownContainer.innerHTML = `
+                        <div class="bg-gray-100 dark:bg-gray-600 p-4 rounded-lg shadow-md">
+                            <div class="text-3xl font-bold text-gray-800 dark:text-white">${days}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-300">Days</div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-600 p-4 rounded-lg shadow-md">
+                            <div class="text-3xl font-bold text-gray-800 dark:text-white">${hours}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-300">Hours</div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-600 p-4 rounded-lg shadow-md">
+                            <div class="text-3xl font-bold text-gray-800 dark:text-white">${minutes}</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-300">Minutes</div>
+                        </div>
+                    `;
+            
+                    if (distance < 0) {
+                        clearInterval(x);
+                        countdownContainer.innerHTML = "<p class='text-xl font-bold text-red-600 dark:text-red-400'>EXPIRED</p>";
+                    }
+                }, 1000);
+            
+                // Update price function
+                function updatePrice() {
+                    const categorySelect = document.getElementById('category');
+                    const priceInput = document.getElementById('price');
+                    const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+                    const price = selectedOption.getAttribute('data-price');
+                    priceInput.value = `₹${price}`;
+                }
+            </script>
+            {% endif %}
+            
+        </div>
+
+        <!-- Details Section - Displayed second on mobile -->
+        <div class="w-full lg:w-1/2 lg:order-1">
+
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5 mb-8">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Details</h2>
+                <div class="bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            <p>Organisers</p>
+                            <p>Date</p>
+                            <p>Venue</p>
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-white font-medium">
+                            <p>{{tournament_data.org}}</p>
+                            <p>{{tournament_data.start_date}} to {{tournament_data.end_date}}</p>
+                            <p>{{tournament_data.venue}}</p>
                         </div>
                     </div>
                 </div>
-                {% else %}
-                <a href="{% url 'core:login' %}"
-                    class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                    Login to Register
-                </a>
-                {% endif %}
+    
+                <div class="mt-6">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Categories</h2>
+                    <ul class="space-y-4">
+                        {% for category in tournament_data.categories %}
+                        <li class="bg-gray-50 dark:bg-gray-500 p-4 rounded-lg">
+                            <a href="{% url 'core:category' tournament_data.name category.catagory_type %}" class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-lg font-medium text-gray-900 dark:text-white">{{ category.catagory_type }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ category.details }}</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-lg font-semibold text-gray-900 dark:text-white mr-4">₹{{ category.price }}</span>
+                                    <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="text-gray-500 dark:text-gray-400">Check back later for categories!</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+    
+                <div class="mt-8">
+                    {% if tournament_data.status %}
+                        {% if user.is_authenticated %}
+                        <button data-modal-target="registration" data-modal-toggle="registration"
+                            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            type="button">
+                            Register
+                        </button>
+                        {% else %}
+                            <a href="{% url 'core:login' %}"
+                                class="block w-full text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                Login to Register
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-
-
-    <div class="w-1/2 flex flex-col items-center ">
-        {% if poster_url %}
-        <img style="border-radius: 15px;" width="400px" src="{{poster_url}}" alt="tournament_poster">
-        {% else %}
-        <img style="border-radius: 15px;" width="400px" src="https://picsum.photos/seed/picsum/400/500" alt="placeholder">
-        {% endif %}
-        
-        <div  class="py-4">
-            <div id="countdown-container" class="max-w-[150px] mx-auto grid grid-cols-3 gap-2 text-center font-sans">
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Set the date and time you want to count down to
-        const countDownDate = new Date("{{ tournament_data.timer }}").getTime();
-
-        // Update the count down every 1 second
-        const x = setInterval(function () {
-            // Get today's date and time
-            const now = new Date().getTime();
-
-            // Find the distance between now and the count down date
-            const distance = countDownDate - now;
-
-            // Time calculations for days, hours, minutes, and seconds
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            // const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Create the countdown container and items
-            const countdownContainer = document.getElementById("countdown-container");
-            countdownContainer.innerHTML = `
-      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
-        <div class="text-xl font-bold text-gray-800">${days}</div>
-        <div class="text-sm text-gray-600">Days</div>
-      </div>
-      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
-        <div class="text-xl font-bold text-gray-800">${hours}</div>
-        <div class="text-sm text-gray-600">Hours</div>
-      </div>
-      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
-        <div class="text-xl font-bold text-gray-800">${minutes}</div>
-        <div class="text-sm text-gray-600">Minutes</div>
-      </div>
-    `;
-
-            // If the count down is finished, write some text
-            if (distance < 0) {
-                clearInterval(x);
-                countdownContainer.innerHTML = "<p>EXPIRED</p>";
-            }
-        }, 1000);
-    </script>
-
-
 </div>
 
+<!-- Registration Modal -->
+<div id="registration" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Register
+                </h3>
+                <button id="close_modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="registration">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <form id="cart-form" class="p-4 md:p-5" action="" method="POST">
+                {% csrf_token %}
+                <div class="grid gap-4 mb-4 grid-cols-1 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                        <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Your Name" required>
+                    </div>
+                    <div>
+                        <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                        <select name="category" id="category" onchange="updatePrice()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                            <option value="" disabled selected>Select category</option>
+                            {% for category in tournament_data.categories %}
+                            <option value="{{category.id}}" data-price="{{category.price}}">{{category.catagory_type}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+                        <input type="text" name="price" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="₹0" disabled>
+                    </div>
+                </div>
+                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Add To Cart
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 {% endblock body %}
