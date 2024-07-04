@@ -12,6 +12,8 @@ __pycache__/
 
 # ignoring db 
 *.sqlite3
+.deployment
+.vscode\settings.json
 
 # Ignoring old_migration files
 old_mig_files/
