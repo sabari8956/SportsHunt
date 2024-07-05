@@ -1,85 +1,142 @@
 {% if fixture_id %}
-<div class="flex flex-col prose">
-    <div class="w-full max-w-screen-xl mx-auto">
-      <script src="https://unpkg.com/gojs"></script>
-      <div id="allSampleContent" class="p-4 w-full">
-        <script id="code">
-
-          async function init() {
-            const $ = go.GraphObject.make;
-            myDiagram = new go.Diagram('myDiagramDiv', {
-              'textEditingTool.starting': go.TextEditingStarting.SingleClick,
-              'textEditingTool.textValidation': isValidScore,
-              layout: $(go.TreeLayout, { angle: 180 }),
-              'undoManager.isEnabled': true,
-            });
-
-            function isValidScore(textblock, oldstr, newstr) {
-              if (newstr === '') return true;
-              const num = parseInt(newstr, 10);
-              return !isNaN(num) && num >= 0 && num < 1000;
-            }
-
-            myDiagram.nodeTemplate = $(go.Node, 'Auto', { selectable: false },
-              $(go.Shape, 'Rectangle', { fill: '#8C8C8C', stroke: null }),
-              $(go.Panel, 'Table',
-                $(go.RowColumnDefinition, { column: 0, separatorStroke: 'black' }),
-                $(go.RowColumnDefinition, { column: 1, separatorStroke: 'black', background: '#BABABA' }),
-                $(go.RowColumnDefinition, { row: 0, separatorStroke: 'black' }),
-                $(go.RowColumnDefinition, { row: 1, separatorStroke: 'black' }),
-                $(go.TextBlock, '', {
-                  row: 0, wrap: go.Wrap.None, margin: 5, width: 90, isMultiline: false, textAlign: 'left', font: '10pt  Segoe UI,sans-serif', stroke: 'white',
-                }, new go.Binding('text', 'player1').makeTwoWay()),
-                $(go.TextBlock, '', {
-                  row: 1, wrap: go.Wrap.None, margin: 5, width: 90, isMultiline: false, textAlign: 'left', font: '10pt  Segoe UI,sans-serif', stroke: 'white',
-                }, new go.Binding('text', 'player2').makeTwoWay()),
-                $(go.TextBlock, '', {
-                  column: 1, row: 0, wrap: go.Wrap.None, margin: 2, width: 25, isMultiline: false, editable: false, textAlign: 'center', font: '10pt  Segoe UI,sans-serif', stroke: 'black',
-                }, new go.Binding('text', 'score1').makeTwoWay()),
-                $(go.TextBlock, '', {
-                  column: 1, row: 1, wrap: go.Wrap.None, margin: 2, width: 25, isMultiline: false, editable: false, textAlign: 'center', font: '10pt  Segoe UI,sans-serif', stroke: 'black',
-                }, new go.Binding('text', 'score2').makeTwoWay())
-              )
-            );
-
-            myDiagram.linkTemplate = $(go.Link, { routing: go.Routing.Orthogonal, selectable: false },
-              $(go.Shape, { strokeWidth: 2, stroke: 'white' })
-            );
-
-            async function fetchTeams() {
-              const response = await fetch('{% url "api:get_fixture_json" fixture_id %}');
-              const teams = await response.json();
-              console.log(teams);
-              return teams;
-            }
-
-            const teams = await fetchTeams();
-            const model = new go.TreeModel(teams);
-            model.addChangedListener((e) => {
-              if (e.propertyName !== 'score1' && e.propertyName !== 'score2') return;
-              const data = e.object;
-              if (isNaN(data.score1) || isNaN(data.score2)) return;
-
-              const parent = myDiagram.findNodeForKey(data.parent);
-              if (parent === null) return;
-
-              const playerName = parseInt(data.score1) > parseInt(data.score2) ? data.player1 : data.player2;
-              if (parseInt(data.score1) === parseInt(data.score2)) playerName = '';
-              myDiagram.model.setDataProperty(parent.data, data.parentNumber === 0 ? 'player1' : 'player2', playerName);
-            });
-
-            myDiagram.model = model;
-
-          }
-
-          window.addEventListener('DOMContentLoaded', init);
-        </script>
-
-        <div id="sample">
-          <div id="myDiagramDiv" style="border: solid 1px black; background: #4d4d4d; width: 700px; height: 600px"></div>
-        </div>
-      </div>
+<div class="w-full mx-auto">
+  <div class="bg-gray-100 dark:bg-gray-800 shadow-lg overflow-hidden">
+    <div class="p-2 bg-gray-200 dark:bg-gray-700">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white">Tournament Bracket</h2>
     </div>
+    <div class="p-1">
+      <div id="myDiagramDiv" class="w-full h-[80vh] min-h-[400px] border border-gray-300 dark:border-gray-600"></div>
+    </div>
+    <div id="errorMessage" class="p-2 text-red-500 hidden"></div>
   </div>
+</div>
 
+<script src="https://unpkg.com/gojs/release/go.js"></script>
+<script>
+  let myDiagram;
+
+  function init() {
+    const $ = go.GraphObject.make;
+    myDiagram = new go.Diagram('myDiagramDiv', {
+      'undoManager.isEnabled': true,
+      layout: $(go.TreeLayout, {
+        angle: 180,
+        layerSpacing: 35,
+        alignment: go.TreeLayout.AlignmentStart
+      }),
+      'animationManager.isEnabled': false,
+      'draggingTool.dragsTree': true,
+      'commandHandler.deletesTree': true,
+      scrollMode: go.Diagram.InfiniteScroll
+    });
+
+    myDiagram.nodeTemplate = $(go.Node, 'Auto', 
+      { selectable: false },
+      $(go.Shape, 'RoundedRectangle', { 
+        fill: '#2C3E50', 
+        stroke: '#34495E',
+        strokeWidth: 2,
+      }),
+      $(go.Panel, 'Table',
+        { defaultAlignment: go.Spot.Left, margin: 4 },
+        $(go.RowColumnDefinition, { column: 0, separatorStroke: 'white' }),
+        $(go.RowColumnDefinition, { column: 1, separatorStroke: 'white' }),
+        $(go.RowColumnDefinition, { row: 0, separatorStroke: 'white', background: '#34495E' }),
+        $(go.RowColumnDefinition, { row: 1, separatorStroke: 'white' }),
+        $(go.TextBlock, '', {
+          row: 0, column: 0, columnSpan: 2,
+          margin: 5, width: 100, height: 25,
+          isMultiline: false, textAlign: 'center',
+          font: 'bold 10pt Arial, sans-serif',
+          stroke: '#ECF0F1'
+        }, new go.Binding('text', 'player1').makeTwoWay()),
+        $(go.TextBlock, '', {
+          row: 1, column: 0, columnSpan: 2,
+          margin: 5, width: 100, height: 25,
+          isMultiline: false, textAlign: 'center',
+          font: 'bold 10pt Arial, sans-serif',
+          stroke: '#ECF0F1'
+        }, new go.Binding('text', 'player2').makeTwoWay()),
+        $(go.TextBlock, '', {
+          row: 0, column: 2,
+          margin: 2, width: 25,
+          isMultiline: false, editable: false, textAlign: 'center',
+          font: 'bold 10pt Arial, sans-serif',
+          stroke: '#ECF0F1'
+        }, new go.Binding('text', 'score1').makeTwoWay()),
+        $(go.TextBlock, '', {
+          row: 1, column: 2,
+          margin: 2, width: 25,
+          isMultiline: false, editable: false, textAlign: 'center',
+          font: 'bold 10pt Arial, sans-serif',
+          stroke: '#ECF0F1'
+        }, new go.Binding('text', 'score2').makeTwoWay())
+      )
+    );
+
+    myDiagram.linkTemplate = $(go.Link, 
+      { routing: go.Link.Orthogonal, corner: 5, selectable: false },
+      $(go.Shape, { strokeWidth: 3, stroke: '#3498DB' })
+    );
+
+    fetchTeams().then(teams => {
+      if (teams && teams.length > 0) {
+        const model = new go.TreeModel(teams);
+        model.addChangedListener((e) => {
+          if (e.propertyName !== 'score1' && e.propertyName !== 'score2') return;
+          const data = e.object;
+          if (isNaN(data.score1) || isNaN(data.score2)) return;
+
+          const parent = myDiagram.findNodeForKey(data.parent);
+          if (parent === null) return;
+
+          let playerName = parseInt(data.score1) > parseInt(data.score2) ? data.player1 : data.player2;
+          if (parseInt(data.score1) === parseInt(data.score2)) playerName = '';
+          myDiagram.model.setDataProperty(parent.data, data.parentNumber === 0 ? 'player1' : 'player2', playerName);
+        });
+
+        myDiagram.model = model;
+        console.log('Diagram model set:', model);
+        updateDiagramSize(); // Call this after setting the model
+      } else {
+        console.error('No teams data available or empty data received');
+        document.getElementById('errorMessage').textContent = 'No tournament data available.';
+        document.getElementById('errorMessage').classList.remove('hidden');
+      }
+    });
+  }
+
+  async function fetchTeams() {
+    try {
+      const response = await fetch('{% url "api:get_fixture_json" fixture_id %}');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const teams = await response.json();
+      console.log('Fetched teams:', teams);
+      return teams;
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+      document.getElementById('errorMessage').textContent = 'Error loading tournament data. Please try again later.';
+      document.getElementById('errorMessage').classList.remove('hidden');
+      return null;
+    }
+  }
+
+  function updateDiagramSize() {
+    if (myDiagram) {
+      const div = myDiagram.div;
+      const containerWidth = div.offsetWidth;
+      const containerHeight = Math.max(window.innerHeight * 0.8, 400);
+      div.style.height = containerHeight + 'px';
+      myDiagram.requestUpdate();
+      myDiagram.zoomToFit();
+      console.log('Diagram size updated');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('click', updateDiagramSize);
+  window.addEventListener('resize', updateDiagramSize);
+</script>
 {% endif %}
