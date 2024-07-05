@@ -182,7 +182,7 @@ def cart_view(req):
         item_dict = {}
         item_dict["members"] = [f'{player.name}' for player in item.members.all()]
         item_dict["category"] = item.category
-        if not item.category.registered:
+        if not item.category.registration:
             cart_data.append(item_dict)
             total += item.category.price
         else:

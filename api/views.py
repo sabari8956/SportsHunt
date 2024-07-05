@@ -18,25 +18,32 @@ from .decorators import host_required, login_required
 @login_required
 @api_view(["POST"])
 def add_to_cart(req):
+    print('here', req.data)
     data = req.data
     if not data:
         return Response({"error": "Data is required"}, status=status.HTTP_400_BAD_REQUEST)
-    name = data.get('name')
-    if not name:
-        return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
-    players_instances = Player.objects.create(name=name)
+    # name = data.get('name')
+    # for key, value in data.items():
+    #     print(key.startswith('name_'))
+    #     if key.startswith('name_'):
+    #         name = data.get(key)
+    #     # print(key, value)
+    # print(name)
     name_fields = [value for key, value in data.lists() if key.startswith('name_')]
+    if not name_fields:
+        return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
     players_instances = [Player.objects.create(name=name[0]) for name in name_fields]
-
+    # players_instances = Player.objects.create(name=name)
+    print('crossed player instances')
     category_id = data.get('category')
     if not category_id:
         return Response({"error": "Category is required"}, status=status.HTTP_400_BAD_REQUEST)
-
+    
     try:
         category_instance = Category.objects.get(id=int(category_id))
     except (ValueError, Category.DoesNotExist):
         return Response({"error": "Invalid category ID"}, status=status.HTTP_400_BAD_REQUEST)
-
+    print('crossed category instance')
     # team_size = category_instance.team_size
     # print(players_instances, team_size)
     # if len(players_instances) != team_size:
@@ -45,8 +52,9 @@ def add_to_cart(req):
     if category_instance.registration:
         return Response({"error": "Registration closed"}, status=status.HTTP_400_BAD_REQUEST)
 
+    print('crossed registration')
     team_instance = Team.objects.create(category=category_instance)
-    team_instance.members.set([players_instances])
+    team_instance.members.set(players_instances)
     user_instance = User.objects.get(username=req.user)
     user_instance.cart.add(team_instance)
     messages.add_message(req, messages.SUCCESS, "added to cart successfully")
