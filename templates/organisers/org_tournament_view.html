@@ -5,122 +5,107 @@ Tournament
 {% endblock title %}
 
 {% block body %}
-<div class="flex p-8">
-
-    <div class="w-1/2">
-        {% if tournament_data.status %}
-        <mark class="px-2 text-white bg-blue-600 rounded dark:{{tournament_data.status_color}}">{{tournament_data.status}}</mark>
-        {% else %}
-        <mark class="px-2 text-white bg-red-600 rounded dark:bg-red-500">Completed</mark>
-        {% endif %}
-        <mark class="px-2 text-white bg-blue-600 rounded dark:bg-blue-500">{{tournament_data.game}}</mark>
-
-
-        <h1
-            class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-            {{tournament_data.name}} <small class="ms-2 font-semibold text-gray-500 dark:text-gray-400">by
-                {{tournament_data.org}}</small> </h1>
-
-
-
-        <div
-            class="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Details</h2>
-            <address
-                class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-2">
-                <div class="space-y-2 text-gray-500 dark:text-gray-400 leading-loose sm:block">
-                    Organisers <br>
-                    Date <br>
-                    Venue
-                </div>
-
-                <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
-                    <a href="#"> {{tournament_data.org}}</a> <br>
-                    {{tournament_data.start_date}} to {{tournament_data.end_date}}<br />
-                    {{tournament_data.venue}}
-                </div>
-            </address>
-
-
-            <div class="pt-4">
-                <div class="flex items-center justify-between my-4">
-                    <h1 class="text-2xl dark:text-white">Categories</h1>
-                    <a href="{% url 'organisers:create_categories' tournament_data.name %}"
-                        class="ml-4 px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-                        New Category
-                    </a>
-                </div>
-                <ul class="max-w-md px-2 divide-y divide-gray-200 dark:divide-gray-700">
-                    {% for category in tournament_data.categories %}
-
-                    <li class="pb-3 sm:pb-4">
-                        <a href="{% url 'organisers:category' tournament_data.name category.catagory_type %}"
-                            class="flex items-center space-x-4 rtl:space-x-reverse">
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                    {{ category.catagory_type }}
-                                </p>
-
-                                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                    {{ category.details }}
-                                </p>
-                            </div>
-                            <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                                {% if category.registration %}
-                                <span class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
-                                    <span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span>
-                                    closed
-                                </span>
-                                {% else %}
-                                <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
-                                    <span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span>
-                                    open
-                                </span>
-                                {% endif %}
-                                ₹{{ category.price }}
-                            </div>
-                            <svg width="100px" height="100px" class="h-10 w-10 text-gray-500 dark:text-gray-400"
-                                viewBox="0 0 24 24" fill="#000000" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M15.0001 13.5V9M15.0001 9H10.5001M15.0001 9L9.00024 14.9999M7.20024 20H16.8002C17.9203 20 18.4804 20 18.9082 19.782C19.2845 19.5903 19.5905 19.2843 19.7823 18.908C20.0002 18.4802 20.0002 17.9201 20.0002 16.8V7.2C20.0002 6.0799 20.0002 5.51984 19.7823 5.09202C19.5905 4.71569 19.2845 4.40973 18.9082 4.21799C18.4804 4 17.9203 4 16.8002 4H7.20024C6.08014 4 5.52009 4 5.09226 4.21799C4.71594 4.40973 4.40998 4.71569 4.21823 5.09202C4.00024 5.51984 4.00024 6.07989 4.00024 7.2V16.8C4.00024 17.9201 4.00024 18.4802 4.21823 18.908C4.40998 19.2843 4.71594 19.5903 5.09226 19.782C5.52009 20 6.08014 20 7.20024 20Z"
-                                    stroke="currentColor" stroke-width="1" stroke-linecap="round"
-                                    stroke-linejoin="round" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </li>
-                    {% empty %}
-                    check later!
-                    {% endfor %}
-                </ul>
+<div class="p-4 md:p-8">
+    <div class="flex flex-col md:flex-row md:space-x-8">
+        <div class="w-full md:w-1/2 mb-8 md:mb-0">
+            <div class="flex flex-wrap gap-2 mb-4">
+                {% if tournament_data.status %}
+                <mark class="px-2 text-white bg-blue-600 rounded dark:{{tournament_data.status_color}}">{{tournament_data.status}}</mark>
+                {% else %}
+                <mark class="px-2 text-white bg-red-600 rounded dark:bg-red-500">Completed</mark>
+                {% endif %}
+                <mark class="px-2 text-white bg-blue-600 rounded dark:bg-blue-500">{{tournament_data.game}}</mark>
             </div>
 
-            <div class="flex flex-col gap-2">
-                
-                <button data-modal-target="registration" data-modal-toggle="registration"
-                    class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    type="button">
-                    Register
-                </button>
+            <h1 class="mb-4 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
+                {{tournament_data.name}} <small class="block mt-2 text-xl font-semibold text-gray-500 dark:text-gray-400">by {{tournament_data.org}}</small>
+            </h1>
 
-                <button data-modal-target="close-reg" data-modal-toggle="close-reg"
-                    class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    type="button">
-                    Close Registration
-                </button>
+            {% if tournament_poster_url %}
+            <img class="w-full rounded-lg mb-6 shadow-lg" src="{{ tournament_poster_url }}" alt="tournament poster">
+            {% else %}
+            <img class="w-full rounded-lg mb-6 shadow-lg" src="https://picsum.photos/seed/picsum/800/600" alt="placeholder">
+            {% endif %}
+
+            <div class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5 mb-8">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Details</h2>
+                <address class="relative bg-gray-50 dark:bg-gray-700 dark:border-gray-600 p-4 rounded-lg border border-gray-200 not-italic grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+                    <div class="space-y-2 text-gray-500 dark:text-gray-400 leading-loose">
+                        Organisers <br>
+                        Date <br>
+                        Venue
+                    </div>
+                    <div id="contact-details" class="space-y-2 text-gray-900 dark:text-white font-medium leading-loose">
+                        <a href="#"> {{tournament_data.org}}</a> <br>
+                        {{tournament_data.start_date}} to {{tournament_data.end_date}}<br />
+                        {{tournament_data.venue}}
+                    </div>
+                </address>
+
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h2 class="text-2xl font-bold dark:text-white">Categories</h2>
+                        <a href="{% url 'organisers:create_categories' tournament_data.name %}"
+                            class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-colors duration-200">
+                            New Category
+                        </a>
+                    </div>
+                    <div class="space-y-4">
+                        {% for category in tournament_data.categories %}
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
+                            <a href="{% url 'organisers:category' tournament_data.name category.catagory_type %}"
+                                class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                                        {{ category.catagory_type }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ category.details }}
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    {% if category.registration %}
+                                    <span class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
+                                        <span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span>
+                                        closed
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+                                        <span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span>
+                                        open
+                                    </span>
+                                    {% endif %}
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">₹{{ category.price }}</span>
+                                </div>
+                            </a>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-gray-500 dark:text-gray-400 py-4">Check back later for categories!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2 mt-4">
+                    <button data-modal-target="registration" data-modal-toggle="registration"
+                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors duration-200"
+                        type="button">
+                        Register
+                    </button>
+                    <button data-modal-target="close-reg" data-modal-toggle="close-reg"
+                        class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 transition-colors duration-200"
+                        type="button">
+                        Close Registration
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-
-    <div class="w-1/2 flex flex-col items-center ">
-        {% if tournament_poster_url %}
-        <img style="border-radius: 15px;" width="400px" src="{{ tournament_poster_url}}" alt="tournament poster">
-        {% else %}
-        <img style="border-radius: 15px;" width="400px" src="https://picsum.photos/seed/picsum/400/500" alt="placeholder">
-        {% endif %}
-        <div class="py-4">
-            <div id="countdown-container" class="max-w-[150px] mx-auto grid grid-cols-3 gap-2 text-center font-sans">
+        <div class="w-full md:w-1/2">
+            <div class="sticky top-4">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-5 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Countdown</h2>
+                    <div id="countdown-container" class="grid grid-cols-3 gap-4 text-center font-sans"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -147,8 +132,7 @@ Tournament
                     </svg>
                     <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Close registration for all
                         category..?</h3>
-                    <button type="button" id="close-reg-btn"
-                        data-modal-hide="close-reg"
+                    <button type="button" id="close-reg-btn" data-modal-hide="close-reg"
                         class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
                         Yes, I'm sure
                     </button>
@@ -159,7 +143,6 @@ Tournament
             </div>
         </div>
     </div>
-
     <div id="registration" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-md max-h-full">
@@ -222,117 +205,113 @@ Tournament
                                 clip-rule="evenodd"></path>
                         </svg>
                         Add To Cart
-                    </button>
+                    </button>   
                 </form>
             </div>
         </div>
     </div>
-
-
-
-    <script>
-        // Set the date and time you want to count down to
-        const countDownDate = new Date("{{tournament_data.timer}}").getTime();
-
-        // Update the count down every 1 second
-        const x = setInterval(function () {
-            // Get today's date and time
-            const now = new Date().getTime();
-
-            // Find the distance between now and the count down date
-            const distance = countDownDate - now;
-
-            // Time calculations for days, hours, minutes, and seconds
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            // const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Create the countdown container and items
-            const countdownContainer = document.getElementById("countdown-container");
-            countdownContainer.innerHTML = `
-      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
-        <div class="text-xl font-bold text-gray-800">${days}</div>
-        <div class="text-sm text-gray-600">Days</div>
-      </div>
-      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
-        <div class="text-xl font-bold text-gray-800">${hours}</div>
-        <div class="text-sm text-gray-600">Hours</div>
-      </div>
-      <div class="bg-gray-100 p-2 rounded-lg shadow-md">
-        <div class="text-xl font-bold text-gray-800">${minutes}</div>
-        <div class="text-sm text-gray-600">Minutes</div>
-      </div>
-    `;
-
-            // If the count down is finished, write some text
-            if (distance < 0) {
-                clearInterval(x);
-                countdownContainer.innerHTML = "<p>EXPIRED</p>";
-            }
-        }, 1000);
-
-
-        function updatePrice() {
-            const category = document.getElementById('category');
-            const price = document.getElementById('price');
-            const selectedOption = category.options[category.selectedIndex];
-            price.value = selectedOption.getAttribute('data-price');
-            category.value = selectedOption.value;
-            console.log(selectedOption);
-        }
-
-        document.getElementById('close-reg-btn').addEventListener('click', function () {
-            console.log('close registration');
-            fetch('{% url "api:close_registration" tournament_data.name %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    "close": "true"
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log(data);
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('There has been a problem with your fetch operation:', error);
-                });
-        });
-
-
-        document.getElementById('cart-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            var formData = new FormData(this);
-
-            fetch('{% url "api:offline_register"  %}', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data);
-                    document.getElementById('name').textContent = '';
-                    window.location.reload();
-                    // document.getElementById('close_modal').click();
-                })
-                .catch(error => {
-                    console.error(error);
-                })
-        })
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-
-
 </div>
+<script>
+    // Set the date and time you want to count down to
+    const countDownDate = new Date("{{tournament_data.timer}}").getTime();
+
+    // Update the count down every 1 second
+    const x = setInterval(function () {
+        // Get today's date and time
+        const now = new Date().getTime();
+
+        // Find the distance between now and the count down date
+        const distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes, and seconds
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        // const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Create the countdown container and items
+        const countdownContainer = document.getElementById("countdown-container");
+        countdownContainer.innerHTML = `
+  <div class="bg-gray-100 p-2 rounded-lg shadow-md">
+    <div class="text-xl font-bold text-gray-800">${days}</div>
+    <div class="text-sm text-gray-600">Days</div>
+  </div>
+  <div class="bg-gray-100 p-2 rounded-lg shadow-md">
+    <div class="text-xl font-bold text-gray-800">${hours}</div>
+    <div class="text-sm text-gray-600">Hours</div>
+  </div>
+  <div class="bg-gray-100 p-2 rounded-lg shadow-md">
+    <div class="text-xl font-bold text-gray-800">${minutes}</div>
+    <div class="text-sm text-gray-600">Minutes</div>
+  </div>
+`;
+
+        // If the count down is finished, write some text
+        if (distance < 0) {
+            clearInterval(x);
+            countdownContainer.innerHTML = "<p>EXPIRED</p>";
+        }
+    }, 1000);
+
+
+    function updatePrice() {
+        const category = document.getElementById('category');
+        const price = document.getElementById('price');
+        const selectedOption = category.options[category.selectedIndex];
+        price.value = selectedOption.getAttribute('data-price');
+        category.value = selectedOption.value;
+        console.log(selectedOption);
+    }
+
+    document.getElementById('close-reg-btn').addEventListener('click', function () {
+        console.log('close registration');
+        fetch('{% url "api:close_registration" tournament_data.name %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                "close": "true"
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                    console.log(response);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    });
+
+
+    document.getElementById('cart-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+
+        fetch('{% url "api:offline_register"  %}', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // console.log(data);
+                document.getElementById('name').textContent = '';
+                window.location.reload();
+                // document.getElementById('close_modal').click();
+            })
+            .catch(error => {
+                console.error(error);
+            })
+    })
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 {% endblock body %}

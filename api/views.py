@@ -395,16 +395,16 @@ def close_registration(req, tournament_name, category_name=None):
         return Response("Tournament not found", status=status.HTTP_404_NOT_FOUND)
     
     tournament_instance = Tournament.objects.get(name=tournament_name)
-    
-    if not tournament_instance.categories.filter(catagory_type=category_name).exists():
-        return Response("Category not found", status=status.HTTP_404_NOT_FOUND)
-    
+      
     if not category_name:
         all_categories = tournament_instance.categories.all()
         for category in all_categories:
             category.registration = True
             category.save()
         return Response("Registration closed for all categories", status=status.HTTP_200_OK)
+    
+    if not tournament_instance.categories.filter(catagory_type=category_name).exists():
+        return Response("Category not found", status=status.HTTP_404_NOT_FOUND)
     
     category_instance = tournament_instance.categories.get(catagory_type=category_name)
     category_instance.registration = True

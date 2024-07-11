@@ -5,127 +5,150 @@ Organisation
 {% endblock title %}
 
 {% block body %}
-<div class="p-4">
-    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
-        <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-dark">Welcome, <span class="underline underline-offset-3 decoration-8 decoration-blue-400 dark:decoration-blue-600"> {{user}} </span></h1>
-        <p class="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">Here at Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p>
+<div class="p-4 md:p-6 lg:p-8 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div class="rounded-lg bg-white dark:bg-gray-800 shadow-md p-6 mt-14">
+        <h1 class="mb-4 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-white">Welcome, <span class="underline underline-offset-3 decoration-4 md:decoration-8 decoration-blue-400 dark:decoration-blue-600">{{user}}</span></h1>
+        <p class="text-base md:text-lg font-normal text-gray-600 dark:text-gray-300">Here at Flowbite we focus on markets where technology, innovation, and capital can unlock long-term value and drive economic growth.</p>
     </div>
- </div>
-<div class="p-4">
 
-    {% for tourn in ongoing_tournaments %}
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Ongoing Tournaments</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for tourn in ongoing_tournaments %}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <h5 class="text-xl font-bold text-gray-900 dark:text-white truncate">{{ tourn.name }}</h5>
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Organised by: {{tourn.org}}</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% for cat in tourn.categories.all %}
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">{{ cat.catagory_type }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Start: 2023-07-15</span>
+                        </div>
+                        <a href="{% url 'organisers:tournament' tournament_name=tourn.name %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">View Details →</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="col-span-full text-center text-gray-500 dark:text-gray-400">No ongoing tournaments</p>
+            {% endfor %}
+        </div>
+    </div>
 
-    <a href="{% url 'organisers:tournament' tournament_name=tourn.name %}"
-        class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
-        <span
-            class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
-        {% for cat in tourn.categories.all %}
-        <span
-            class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">{{ cat.catagory_type }}</span>
-        {% endfor %}
-    </a>
-    {% empty %}
-    NO ongoing TOURNAMENTS
-    {% endfor %}
-
-
-
-    <div class="w-3/4">
+    <div class="mt-12 w-full bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mt-8">
         <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content" data-tabs-active-classes="text-purple-600 hover:text-purple-600 dark:text-purple-500 dark:hover:text-purple-500 border-purple-600 dark:border-purple-500" data-tabs-inactive-classes="dark:border-transparent text-gray-500 hover:text-gray-600 dark:text-gray-400 border-gray-100 hover:border-gray-300 dark:border-gray-700 dark:hover:text-gray-300" role="tablist">
-                <li class="me-2" role="presentation">
-                    <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-styled-tab" data-tabs-target="#styled-profile" type="button" role="tab" aria-controls="profile" aria-selected="false">UpComing Tournaments</button>
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="tournamentTabs" role="tablist">
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block p-4 border-b-2 rounded-t-lg text-gray-400 dark:hover:text-gray-300" id="upcoming-tab" data-tabs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="false">Upcoming</button>
                 </li>
-                <li class="me-2" role="presentation">
-                    <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-styled-tab" data-tabs-target="#styled-settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Recent Tournaments</button>
-                </li>
-                <li class="me-2" role="presentation">
-                    <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="dashboard-styled-tab" data-tabs-target="#styled-dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false">On going matches</button>
-                </li>
-                <li role="presentation">
-                    <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="contacts-styled-tab" data-tabs-target="#styled-contacts" type="button" role="tab" aria-controls="contacts" aria-selected="false">Lorem</button>
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block p-4 border-b-2 rounded-t-lg text-gray-400 hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="recent-tab" data-tabs-target="#recent" type="button" role="tab" aria-controls="recent" aria-selected="false">Recent</button>
                 </li>
             </ul>
         </div>
-        <div id="default-styled-tab-content">
-            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-profile" role="tabpanel" aria-labelledby="profile-tab">
-
-                <div class="flex justify-between items-center my-8">
-                    <h2 class="text-4xl font-extrabold dark:text-white">Upcoming Matches</h2>
+        <div id="tournamentTabContent">
+            <div class="hidden p-4 rounded-lg" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h2 class="text-2xl md:text-3xl font-extrabold dark:text-white mb-4 md:mb-0">Upcoming Tournaments</h2>
                     {% if upcoming_tournaments %}
-                        <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
-                    
+                        <a href="" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">View More</a>
                     {% else %}
-                        <a href="{% url 'organisers:new_tournament' %}" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">New Tournament</a>
-
+                        <a href="{% url 'organisers:new_tournament' %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">New Tournament</a>
                     {% endif %}
                 </div>
 
-        
-                <div class="flex gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for tourn in upcoming_tournaments %}
-        
-                    <a href="{% url 'organisers:tournament' tournament_name=tourn.name %}"
-                        class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-        
-                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
-                        <span
-                            class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
-                        {% for cat in tourn.categories.all %}
-                        <span
-                            class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">{{ cat.catagory_type }}</span>
-                        {% endfor %}
-                    </a>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-3">
+                                <h5 class="text-xl font-bold text-gray-900 dark:text-white truncate">{{ tourn.name }}</h5>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Upcoming</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Organised by: {{tourn.org}}</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                {% for cat in tourn.categories.all %}
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">{{ cat.catagory_type }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Start: 2023-08-01</span>
+                                </div>
+                                <a href="{% url 'organisers:tournament' tournament_name=tourn.name %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">View Details →</a>
+                            </div>
+                        </div>
+                    </div>
                     {% empty %}
-                    NO UPCOMING TOURNAMENTS
+                    <p class="col-span-full text-center text-gray-500 dark:text-gray-400">No upcoming tournaments</p>
                     {% endfor %}
-        
                 </div>
-
             </div>
 
-            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-settings" role="tabpanel" aria-labelledby="settings-tab">
-
-                <div class="flex justify-between items-center my-8">
-                    <h2 class="text-4xl font-extrabold dark:text-white">Recent Matches</h2>
+            <div class="hidden p-4 rounded-lg" id="recent" role="tabpanel" aria-labelledby="recent-tab">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h2 class="text-2xl md:text-3xl font-extrabold dark:text-white mb-4 md:mb-0">Recent Tournaments</h2>
                     {% if recent_tournaments %}
-                    <a href="" class="ml-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">View More</a>
+                    <a href="" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">View More</a>
                     {% endif %}
                 </div>
-        
-                <div class="flex gap-4">
-        
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for tourn in recent_tournaments %}
-                    <a href="{% url 'organisers:tournament' tourn.name %}"
-                        class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-            
-                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ tourn.name }}</h5>
-                        <span
-                            class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-indigo-900 dark:text-indigo-300">{{tourn.org}}</span>
-                        <br>
-                        {% for cat in tourn.categories.all %}
-                        <span
-                            class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-semibold me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400 inline-flex items-center justify-center">
-                            {{ cat.catagory_type }}</span>
-                        {% endfor %}
-                    </a>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div class="p-5">
+                            <div class="flex justify-between items-center mb-3">
+                                <h5 class="text-xl font-bold text-gray-900 dark:text-white truncate">{{ tourn.name }}</h5>
+                                <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-600 dark:text-gray-300">Completed</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Organised by: {{tourn.org}}</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                {% for cat in tourn.categories.all %}
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">{{ cat.catagory_type }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Ended: 2023-06-30</span>
+                                </div>
+                                <a href="{% url 'organisers:tournament' tourn.name %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">View Results →</a>
+                            </div>
+                        </div>
+                    </div>
                     {% empty %}
-                    NO Recent TOURNAMENTS
+                    <p class="col-span-full text-center text-gray-500 dark:text-gray-400">No recent tournaments</p>
                     {% endfor %}
                 </div>
-
-            </div>
-
-            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
-                <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Dashboard tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>
-            </div>
-
-            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="styled-contacts" role="tabpanel" aria-labelledby="contacts-tab">
-                <p class="text-sm text-gray-500 dark:text-gray-400">This is some placeholder content the <strong class="font-medium text-gray-800 dark:text-white">Contacts tab's associated content</strong>. Clicking another tab will toggle the visibility of this one for the next. The tab JavaScript swaps classes to control the content visibility and styling.</p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Simple tab functionality
+    const tabButtons = document.querySelectorAll('#tournamentTabs button');
+    const tabContents = document.querySelectorAll('#tournamentTabContent > div');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = document.querySelector(button.dataset.tabsTarget);
+            tabContents.forEach(content => content.classList.add('hidden'));
+            tabButtons.forEach(btn => btn.classList.remove('text-blue-600', 'border-blue-600', 'dark:text-blue-500', 'dark:border-blue-500'));
+            target.classList.remove('hidden');
+            button.classList.add('text-blue-600', 'border-blue-600', 'dark:text-blue-500', 'dark:border-blue-500');
+        });
+    });
+
+    // Set the first tab as active by default
+    tabButtons[0].click();
+</script>
 {% endblock body %}
